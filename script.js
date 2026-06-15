@@ -115,7 +115,7 @@ async function checkAuth() {
 // Fetch all settings, lists, and active status
 async function fetchSettings() {
     try {
-        const res = await fetch('api.php?action=get_settings');
+        const res = await fetch(`api.php?action=get_settings&t=${Date.now()}`);
         systemSettings = await res.json();
         
         // Synchronize selected council and names
@@ -134,7 +134,7 @@ async function fetchSettings() {
 // Fetch Active Requests or Archives
 async function fetchRequests(isHistory = false) {
     try {
-        const res = await fetch(`api.php?action=get_requests&history=${isHistory}`);
+        const res = await fetch(`api.php?action=get_requests&history=${isHistory}&t=${Date.now()}`);
         const data = await res.json();
         if (isHistory) {
             archiveRequests = data;
@@ -150,7 +150,7 @@ async function fetchRequests(isHistory = false) {
 // Fetch Announcements
 async function fetchAnnouncements() {
     try {
-        const res = await fetch('api.php?action=get_announcements');
+        const res = await fetch(`api.php?action=get_announcements&t=${Date.now()}`);
         announcements = await res.json();
         renderAnnouncements();
         updateNotificationBadge();
@@ -163,7 +163,7 @@ async function fetchAnnouncements() {
 async function fetchUsers() {
     if (currentUser.role !== 'admin') return;
     try {
-        const res = await fetch('api.php?action=get_users');
+        const res = await fetch(`api.php?action=get_users&t=${Date.now()}`);
         allUsers = await res.json();
         renderUsersList();
     } catch (e) {
@@ -188,11 +188,16 @@ async function initApp() {
     await fetchRequests(true);
     await fetchAnnouncements();
     
-    if (currentUser.role === 'admin') {
-        await fetchUsers();
-        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('d-none'));
+    if (currentUser.role === 'admin' || currentUser.role === 'delegate') {
+        document.querySelectorAll('.delegate-admin-only').forEach(el => el.classList.remove('d-none'));        
+        if (currentUser.role === 'admin') {
+            await fetchUsers();
+            document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('d-none'));
+        } else {
+            document.querySelectorAll('.admin-only').forEach(el => el.classList.add('d-none'));
+        }
     } else {
-        document.querySelectorAll('.admin-only').forEach(el => el.classList.add('d-none'));
+        document.querySelectorAll('.admin-only, .delegate-admin-only').forEach(el => el.classList.add('d-none'));
     }
 
     if (currentUser.role === 'delegate') {

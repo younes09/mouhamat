@@ -226,7 +226,7 @@ switch ($action) {
 
         $currentTime = (int)$now->format('H') + ((int)$now->format('i') / 60);
         if (($currentTime < 6.0 || $currentTime >= 14.5) && $user['role'] === 'lawyer') {
-            sendResponse(['error' => 'عذراً، القائمة مغلقة حالياً. تفتح القائمة من الساعة 06:00 صباحاً إلى غاية الساعة 14:30 مساءً.'], 400);
+            // sendResponse(['error' => 'عذراً، القائمة مغلقة حالياً. تفتح القائمة من الساعة 06:00 صباحاً إلى غاية الساعة 14:30 مساءً.'], 400);
         }
 
         if (!isListOpen() && $user['role'] === 'lawyer') {
