@@ -1,0 +1,331 @@
+/* Import Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* Color Variables and Theme Settings */
+:root {
+  --font-sans: 'Cairo', 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Color Palette (Hex overrides to prevent html2canvas oklch bugs) */
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  
+  --emerald-50: #ecfdf5;
+  --emerald-100: #d1fae5;
+  --emerald-200: #a7f3d0;
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+  
+  --amber-50: #fffbeb;
+  --amber-100: #fef3c7;
+  --amber-200: #fde68a;
+  --amber-600: #d97706;
+  --amber-700: #b45309;
+  
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-600: #2563eb;
+  --blue-700: #1d4ed8;
+  
+  --red-50: #fef2f2;
+  --red-100: #fee2e2;
+  --red-600: #dc2626;
+  --red-700: #b91c1c;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.dark {
+  --bg-main: #020617;
+  --bg-card: #0f172a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #1e293b;
+  
+  --emerald-50: rgba(6, 78, 59, 0.2);
+  --emerald-100: rgba(6, 78, 59, 0.4);
+  --emerald-200: rgba(16, 185, 129, 0.3);
+  
+  --amber-50: rgba(120, 53, 15, 0.2);
+  --amber-100: rgba(120, 53, 15, 0.4);
+  --amber-200: rgba(245, 158, 11, 0.3);
+  
+  --blue-50: rgba(30, 58, 138, 0.2);
+  --blue-100: rgba(30, 58, 138, 0.4);
+  --blue-200: rgba(59, 130, 246, 0.3);
+  
+  --red-50: rgba(127, 29, 29, 0.2);
+  --red-100: rgba(127, 29, 29, 0.4);
+}
+
+/* Global resets & styling overrides */
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-main) !important;
+  color: var(--text-main) !important;
+  transition: background-color 0.3s, color 0.3s;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Premium Card and Element Design */
+.premium-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s, border-color 0.3s;
+}
+
+.premium-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.glass-modal {
+  background: rgba(var(--bg-card), 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+}
+
+/* Animations and Micro-interactions */
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scale-active:active {
+  transform: scale(0.95);
+}
+
+/* Custom Navigation Tabs */
+.nav-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 1rem 0.5rem;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.nav-tab-btn:hover {
+  color: var(--emerald-600);
+}
+
+.nav-tab-btn.active {
+  color: var(--emerald-600);
+  border-bottom-color: var(--emerald-600);
+}
+
+.dark .nav-tab-btn:hover,
+.dark .nav-tab-btn.active {
+  color: var(--emerald-500);
+  border-bottom-color: var(--emerald-500);
+}
+
+/* Table Customization */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table th {
+  background-color: var(--bg-main);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.custom-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+/* Calendar Styling to match React calendar */
+.flatpickr-calendar-inline {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-md) !important;
+  border-radius: 1rem !important;
+  font-family: var(--font-sans) !important;
+}
+
+.flatpickr-calendar-inline .flatpickr-months .flatpickr-month {
+  color: var(--text-main) !important;
+  font-weight: 700 !important;
+}
+
+.flatpickr-calendar-inline .flatpickr-weekdays .flatpickr-weekday {
+  color: var(--text-muted) !important;
+  font-weight: 700 !important;
+}
+
+.flatpickr-calendar-inline .flatpickr-day {
+  color: var(--text-main) !important;
+  border-radius: 0.5rem !important;
+}
+
+.flatpickr-calendar-inline .flatpickr-day.today {
+  background: var(--border-color) !important;
+  border-color: transparent !important;
+  color: var(--emerald-600) !important;
+  font-weight: 700;
+}
+
+.flatpickr-calendar-inline .flatpickr-day.selected {
+  background: var(--emerald-600) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+.dark .flatpickr-calendar-inline .flatpickr-day.today {
+  color: var(--emerald-500) !important;
+}
+
+.dark .flatpickr-calendar-inline .flatpickr-day.selected {
+  background: var(--emerald-500) !important;
+}
+
+/* Custom form elements */
+.form-input-custom {
+  background-color: var(--bg-main) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: ring 0.2s, border-color 0.2s;
+  outline: none;
+}
+
+.form-input-custom:focus {
+  border-color: var(--emerald-600) !important;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Dark mode overrides for libraries */
+.dark .flatpickr-calendar {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-xl);
+}
+.dark .flatpickr-month,
+.dark .flatpickr-weekday,
+.dark .flatpickr-day {
+  color: var(--text-main);
+}
+.dark .flatpickr-day:hover {
+  background: var(--border-color);
+}
+
+/* Specific button styles */
+.btn-emerald {
+  background-color: var(--emerald-600);
+  color: white;
+  font-weight: 700;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.2);
+  transition: all 0.2s;
+}
+
+.btn-emerald:hover {
+  background-color: var(--emerald-700);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.btn-emerald:active {
+  transform: translateY(0);
+}
+
+/* Print view customization */
+@media print {
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+  
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  .print-block {
+    display: block !important;
+  }
+
+  .print-border-black {
+    border-color: #000000 !important;
+  }
+
+  .print-bg-slate {
+    background-color: #f1f5f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  table {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: fixed !important;
+  }
+
+  th, td {
+    border: 1px solid #000000 !important;
+    padding: 6px 8px !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+  }
+
+  th {
+    background-color: #f8fafc !important;
+    font-weight: 700 !important;
+  }
+}
