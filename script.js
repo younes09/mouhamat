@@ -536,6 +536,51 @@ function renderRequestsTable() {
         mobileContainer.appendChild(card);
     });
 
+    // Populate Official Print Template
+    const printSessionDateEl = document.getElementById('printSessionDate');
+    const printCenterSubTitleEl = document.getElementById('printCenterSubTitle');
+    const printJurisdictionNameEl = document.getElementById('printJurisdictionName');
+    const printJurisdictionSubEntityEl = document.getElementById('printJurisdictionSubEntity');
+    const printTableBodyEl = document.getElementById('printTableBody');
+
+    if (printSessionDateEl) {
+        printSessionDateEl.innerText = selectedDate.replace(/-/g, '/');
+    }
+    if (printCenterSubTitleEl) {
+        printCenterSubTitleEl.innerText = `*** مندوبية ${currentJurisdiction.name} ***`;
+    }
+    if (printJurisdictionNameEl) {
+        printJurisdictionNameEl.innerText = currentJurisdiction.name;
+    }
+    if (printJurisdictionSubEntityEl) {
+        printJurisdictionSubEntityEl.innerText = currentJurisdiction.subEntity;
+    }
+    if (printTableBodyEl) {
+        printTableBodyEl.innerHTML = '';
+        if (finalRequests.length === 0) {
+            printTableBodyEl.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 25px; font-weight: bold; color: #555555;">لا توجد طلبات مسجلة لهذه الجلسة</td>
+                </tr>
+            `;
+        } else {
+            finalRequests.forEach((req, idx) => {
+                const indexText = String(idx + 1).padStart(2, '0');
+                const oathText = req.purpose === 'delay' ? 'تأجيل' : (req.oathDate || '—');
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="width: 7%;">${indexText}</td>
+                    <td class="font-monospace" style="width: 15%;">${req.caseNumber}</td>
+                    <td style="width: 38%;">${req.parties}</td>
+                    <td style="width: 25%;">${req.lawyerName}</td>
+                    <td style="width: 15%;">${oathText}</td>
+                `;
+                printTableBodyEl.appendChild(tr);
+            });
+        }
+    }
+
     if (window.lucide) lucide.createIcons();
 }
 

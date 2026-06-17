@@ -280,52 +280,152 @@ body {
 /* Print view customization */
 @media print {
   @page {
-    margin: 1cm;
-    size: A4;
+    margin: 0; /* Let's set margin 0 and use page padding/frame margin for exact alignment */
+    size: A4 portrait;
   }
   
   body {
     background: #ffffff !important;
     color: #000000 !important;
     font-size: 11pt;
+    font-family: 'Cairo', sans-serif !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   .print-hidden {
     display: none !important;
   }
 
-  .print-block {
+  /* Print Page Frame Container */
+  .print-page-frame {
     display: block !important;
-  }
-
-  .print-border-black {
-    border-color: #000000 !important;
-  }
-
-  .print-bg-slate {
-    background-color: #f1f5f9 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  table {
-    width: 100% !important;
-    max-width: 100% !important;
-    border-collapse: collapse !important;
-    table-layout: fixed !important;
-  }
-
-  th, td {
     border: 1px solid #000000 !important;
-    padding: 6px 8px !important;
-    word-break: break-word !important;
-    overflow-wrap: break-word !important;
-    color: #000000 !important;
-    background-color: #ffffff !important;
+    padding: 3px !important;
+    /* margin: 0mm 0mm !important; */
+    box-sizing: border-box;
+    background: #ffffff !important;
+  }
+  
+  .print-page-inner-frame {
+    border: 2px solid #000000 !important;
+    padding: 15px 20px !important;
+    box-sizing: border-box;
+    min-height: 250mm; /* Fills standard A4 printable area vertically */
+    display: flex;
+    flex-direction: column;
   }
 
-  th {
-    background-color: #f8fafc !important;
+  /* Header structure */
+  .print-header-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1.2fr 1fr !important;
+    align-items: start !important;
+    width: 100% !important;
+    margin-bottom: 20px !important;
+    direction: rtl !important;
+  }
+
+  .print-header-side {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .print-header-center {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    justify-content: center !important;
+    padding-top: 15px !important;
+  }
+
+  .print-header-center h4 {
+    font-size: 14pt !important;
+    font-weight: 900 !important;
+    margin-bottom: 5px !important;
+    color: #000000 !important;
+  }
+
+  .print-header-center h5 {
+    font-size: 11pt !important;
     font-weight: 700 !important;
+    margin-bottom: 0 !important;
+    color: #000000 !important;
+  }
+
+  .print-stamp-container {
+    width: 90px !important;
+    height: 90px !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-bottom: 8px !important;
+  }
+
+  .print-stamp-container svg {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .print-header-subtext {
+    font-size: 10.5pt !important;
+    font-weight: bold !important;
+    margin: 2px 0 !important;
+    color: #000000 !important;
+  }
+
+  .print-header-date-box {
+    font-size: 11pt !important;
+    font-weight: bold !important;
+    margin-top: 5px !important;
+    border-bottom: 1.5px solid #000000 !important;
+    padding-bottom: 2px !important;
+  }
+
+  /* List Title */
+  .print-list-title {
+    text-align: center !important;
+    font-size: 15pt !important;
+    font-weight: 900 !important;
+    margin: 15px 0 25px 0 !important;
+    direction: rtl !important;
+    color: #000000 !important;
+  }
+
+  /* Table styling */
+  .print-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 10px !important;
+    direction: rtl !important;
+  }
+
+  .print-table th, .print-table td {
+    border: 1.5px solid #000000 !important;
+    padding: 8px 6px !important;
+    font-size: 10.5pt !important;
+    color: #000000 !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    box-sizing: border-box !important;
+  }
+
+  .print-table th {
+    background-color: #ffffff !important;
+    font-weight: 900 !important;
+  }
+
+  .print-table td {
+    font-weight: bold !important;
+  }
+
+  /* Custom font-weight overrides for numbers / ids */
+  .print-table td.font-monospace {
+    font-family: monospace !important;
+    font-size: 11pt !important;
   }
 }
+

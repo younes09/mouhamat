@@ -251,13 +251,13 @@ $user_json = json_encode($_SESSION['user'], JSON_UNESCAPED_UNICODE);
 
             <!-- Admin archive/clear actions -->
             <button onclick="archiveCurrentList()"
-              class="btn btn-dark admin-only d-none d-flex align-items-center gap-2 scale-active"
+              class="btn btn-dark delegate-admin-only d-none d-flex align-items-center gap-2 scale-active"
               title="نقل القائمة للأرشيف">
               <i data-lucide="history" class="w-5 h-5"></i>
               أرشفة
             </button>
             <button onclick="clearCurrentList()"
-              class="btn btn-danger admin-only d-none d-flex align-items-center gap-2 scale-active"
+              class="btn btn-danger delegate-admin-only d-none d-flex align-items-center gap-2 scale-active"
               title="مسح القائمة الحالية">
               <i data-lucide="trash-2" class="w-5 h-5"></i>
               مسح القائمة
@@ -281,7 +281,7 @@ $user_json = json_encode($_SESSION['user'], JSON_UNESCAPED_UNICODE);
         </div>
 
         <!-- Desktop requests table -->
-        <div class="card premium-card overflow-hidden shadow-sm d-none d-md-block print-block">
+        <div class="card premium-card overflow-hidden shadow-sm d-none d-md-block print-hidden">
           <div class="table-responsive">
             <table class="table custom-table mb-0">
               <thead>
@@ -844,6 +844,106 @@ $user_json = json_encode($_SESSION['user'], JSON_UNESCAPED_UNICODE);
     <div class="d-flex align-items-center gap-2">
       <div id="toastIcon"></div>
       <span class="text-sm fw-bold" id="toastMessageText">العملية ناجحة</span>
+    </div>
+  </div>
+
+
+  <!-- ==================== OFFICIAL PRINT TEMPLATE (HIDDEN ON SCREEN, SHOWN ON PRINT) ==================== -->
+  <div id="officialPrintTemplate" class="d-none print-page-frame">
+    <div class="print-page-inner-frame">
+      
+      <!-- Top header layout -->
+      <div class="print-header-grid">
+        
+        <!-- Left Side: Date + Stamp -->
+        <div class="print-header-side">
+          <div class="print-stamp-container">
+            <!-- Left SVG Stamp: مندوب النقيب -->
+            <!-- <svg width="100" height="100" viewBox="0 0 100 100">
+              <defs>
+                <path id="left-stamp-top-path" d="M 12 50 A 38 38 0 0 1 88 50" fill="none" />
+                <path id="left-stamp-bottom-path" d="M 88 50 A 38 38 0 0 1 12 50" fill="none" />
+              </defs>
+              <circle cx="50" cy="50" r="48" fill="none" stroke="#000000" stroke-width="1.5" />
+              <circle cx="50" cy="50" r="44" fill="none" stroke="#000000" stroke-width="1" stroke-dasharray="1.5 1.5" />
+              <circle cx="50" cy="50" r="34" fill="none" stroke="#000000" stroke-width="1" />
+              
+              <text font-size="7.5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000">
+                <textPath href="#left-stamp-top-path" startOffset="50%" text-anchor="middle">منظمة محامي البليدة</textPath>
+              </text>
+              <text x="50" y="52" font-size="7.5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000" text-anchor="middle">★ مندوب النقيب ★</text>
+              <text x="50" y="60" font-size="5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000" text-anchor="middle">البليدة</text>
+              <text font-size="5.5" font-family="'Cairo', sans-serif" fill="#000000">
+                <textPath href="#left-stamp-bottom-path" startOffset="50%" text-anchor="middle">31 نهج كريتلي مختار - البليدة</textPath>
+              </text>
+            </svg> -->
+          </div>
+          <!-- Dynamic session date -->
+          <div class="print-header-date-box">
+            جلسة: <span id="printSessionDate">2026/06/15</span>
+          </div>
+        </div>
+
+        <!-- Center Header Title Lines -->
+        <div class="print-header-center">
+          <h4>**** نقابة المحامين البليدة ***</h4>
+          <h5 id="printCenterSubTitle">*** مندوبية محكمة البليدة ***</h5>
+        </div>
+
+        <!-- Right Side: Stamp + Dynamic Court/Sub-entity -->
+        <div class="print-header-side">
+          <div class="print-stamp-container">
+            <!-- Right SVG Stamp: منظمة محامي البليدة / مندوبية البليدة -->
+            <!-- <svg width="100" height="100" viewBox="0 0 100 100">
+              <defs>
+                <path id="right-stamp-top-path" d="M 12 50 A 38 38 0 0 1 88 50" fill="none" />
+                <path id="right-stamp-bottom-path" d="M 88 50 A 38 38 0 0 1 12 50" fill="none" />
+              </defs>
+              <circle cx="50" cy="50" r="48" fill="none" stroke="#000000" stroke-width="1.5" />
+              <circle cx="50" cy="50" r="44" fill="none" stroke="#000000" stroke-width="1" stroke-dasharray="1.5 1.5" />
+              <circle cx="50" cy="50" r="34" fill="none" stroke="#000000" stroke-width="1" />
+              
+              <text font-size="7.5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000">
+                <textPath href="#right-stamp-top-path" startOffset="50%" text-anchor="middle">منظمة محامي البليدة</textPath>
+              </text>
+              <text font-size="7" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000">
+                <textPath href="#right-stamp-bottom-path" startOffset="50%" text-anchor="middle">★ مندوبية البليدة ★</textPath>
+              </text>
+              <g transform="translate(38, 38) scale(0.18)" stroke="#000000" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M 10 25 L 54 25" stroke-width="5" />
+                <path d="M 32 12 L 32 55" stroke-width="5" />
+                <path d="M 22 55 L 42 55" stroke-width="5" />
+                <path d="M 10 25 L 3 43 L 17 43 Z" />
+                <path d="M 54 25 L 47 43 L 61 43 Z" />
+              </g>
+            </svg> -->
+          </div>
+          <!-- Dynamic Jurisdiction and sub-entity -->
+          <div class="print-header-subtext" id="printJurisdictionName">محكمة البليدة</div>
+          <div class="print-header-subtext" id="printJurisdictionSubEntity">قسم الجنح</div>
+        </div>
+
+      </div>
+
+      <!-- Main Title -->
+      <div class="print-list-title">*** قائمة أسبقية المحامين ***</div>
+
+      <!-- Main Print Table -->
+      <table class="print-table">
+        <thead>
+          <tr>
+            <th style="width: 7%;">الرقم</th>
+            <th style="width: 15%;">رقم القضية</th>
+            <th style="width: 38%;">الأطراف</th>
+            <th style="width: 25%;">الأستاذ (ة)</th>
+            <th style="width: 15%;">أداء اليمين</th>
+          </tr>
+        </thead>
+        <tbody id="printTableBody">
+          <!-- Rows will be injected here dynamically by script.js -->
+        </tbody>
+      </table>
+
     </div>
   </div>
 
