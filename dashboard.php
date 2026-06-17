@@ -849,7 +849,8 @@ $user_json = json_encode($_SESSION['user'], JSON_UNESCAPED_UNICODE);
 
 
   <!-- ==================== OFFICIAL PRINT TEMPLATE (HIDDEN ON SCREEN, SHOWN ON PRINT) ==================== -->
-  <div id="officialPrintTemplate" class="d-none print-page-frame">
+  <!-- Off-screen but always rendered so html2canvas can capture it for PDF -->
+  <div id="officialPrintTemplate" class="print-page-frame" style="position: fixed; left: -9999px; top: 0; width: 794px; z-index: -1; background: #ffffff;">
     <div class="print-page-inner-frame">
       
       <!-- Top header layout -->
@@ -859,24 +860,21 @@ $user_json = json_encode($_SESSION['user'], JSON_UNESCAPED_UNICODE);
         <div class="print-header-side">
           <div class="print-stamp-container">
             <!-- Left SVG Stamp: مندوب النقيب -->
-            <!-- <svg width="100" height="100" viewBox="0 0 100 100">
-              <defs>
-                <path id="left-stamp-top-path" d="M 12 50 A 38 38 0 0 1 88 50" fill="none" />
-                <path id="left-stamp-bottom-path" d="M 88 50 A 38 38 0 0 1 12 50" fill="none" />
-              </defs>
+            <svg width="100" height="100" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="48" fill="none" stroke="#000000" stroke-width="1.5" />
               <circle cx="50" cy="50" r="44" fill="none" stroke="#000000" stroke-width="1" stroke-dasharray="1.5 1.5" />
               <circle cx="50" cy="50" r="34" fill="none" stroke="#000000" stroke-width="1" />
               
-              <text font-size="7.5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000">
-                <textPath href="#left-stamp-top-path" startOffset="50%" text-anchor="middle">منظمة محامي البليدة</textPath>
-              </text>
-              <text x="50" y="52" font-size="7.5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000" text-anchor="middle">★ مندوب النقيب ★</text>
-              <text x="50" y="60" font-size="5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000" text-anchor="middle">البليدة</text>
-              <text font-size="5.5" font-family="'Cairo', sans-serif" fill="#000000">
-                <textPath href="#left-stamp-bottom-path" startOffset="50%" text-anchor="middle">31 نهج كريتلي مختار - البليدة</textPath>
-              </text>
-            </svg> -->
+              <text x="50" y="24" font-size="6" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000" text-anchor="middle">منظمة محامي البليدة</text>
+              <line x1="20" y1="30" x2="80" y2="30" stroke="#000000" stroke-width="0.75" />
+              
+              <text x="50" y="46" font-size="8" font-family="'Cairo', sans-serif" font-weight="black" fill="#000000" text-anchor="middle">مندوب</text>
+              <text x="50" y="58" font-size="8" font-family="'Cairo', sans-serif" font-weight="black" fill="#000000" text-anchor="middle">النقيب</text>
+              
+              <line x1="20" y1="66" x2="80" y2="66" stroke="#000000" stroke-width="0.75" />
+              <text x="50" y="78" font-size="5" font-family="'Cairo', sans-serif" fill="#000000" text-anchor="middle">31 نهج كريتلي مختار</text>
+              <text x="50" y="86" font-size="5" font-family="'Cairo', sans-serif" fill="#000000" text-anchor="middle">البليدة</text>
+            </svg>
           </div>
           <!-- Dynamic session date -->
           <div class="print-header-date-box">
@@ -894,29 +892,26 @@ $user_json = json_encode($_SESSION['user'], JSON_UNESCAPED_UNICODE);
         <div class="print-header-side">
           <div class="print-stamp-container">
             <!-- Right SVG Stamp: منظمة محامي البليدة / مندوبية البليدة -->
-            <!-- <svg width="100" height="100" viewBox="0 0 100 100">
-              <defs>
-                <path id="right-stamp-top-path" d="M 12 50 A 38 38 0 0 1 88 50" fill="none" />
-                <path id="right-stamp-bottom-path" d="M 88 50 A 38 38 0 0 1 12 50" fill="none" />
-              </defs>
+            <svg width="100" height="100" viewBox="0 0 100 100">
               <circle cx="50" cy="50" r="48" fill="none" stroke="#000000" stroke-width="1.5" />
               <circle cx="50" cy="50" r="44" fill="none" stroke="#000000" stroke-width="1" stroke-dasharray="1.5 1.5" />
               <circle cx="50" cy="50" r="34" fill="none" stroke="#000000" stroke-width="1" />
               
-              <text font-size="7.5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000">
-                <textPath href="#right-stamp-top-path" startOffset="50%" text-anchor="middle">منظمة محامي البليدة</textPath>
-              </text>
-              <text font-size="7" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000">
-                <textPath href="#right-stamp-bottom-path" startOffset="50%" text-anchor="middle">★ مندوبية البليدة ★</textPath>
-              </text>
-              <g transform="translate(38, 38) scale(0.18)" stroke="#000000" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <text x="50" y="24" font-size="6.5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000" text-anchor="middle">منظمة محامي البليدة</text>
+              <line x1="20" y1="30" x2="80" y2="30" stroke="#000000" stroke-width="0.75" />
+              
+              <g transform="translate(38, 36) scale(0.18)" stroke="#000000" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M 10 25 L 54 25" stroke-width="5" />
                 <path d="M 32 12 L 32 55" stroke-width="5" />
                 <path d="M 22 55 L 42 55" stroke-width="5" />
                 <path d="M 10 25 L 3 43 L 17 43 Z" />
                 <path d="M 54 25 L 47 43 L 61 43 Z" />
               </g>
-            </svg> -->
+              
+              <line x1="20" y1="68" x2="80" y2="68" stroke="#000000" stroke-width="0.75" />
+              <text x="50" y="78" font-size="6.5" font-family="'Cairo', sans-serif" font-weight="bold" fill="#000000" text-anchor="middle">مندوبية البليدة</text>
+              <text x="50" y="86" font-size="5" font-family="'Cairo', sans-serif" fill="#000000" text-anchor="middle">مجلس قضاء البليدة</text>
+            </svg>
           </div>
           <!-- Dynamic Jurisdiction and sub-entity -->
           <div class="print-header-subtext" id="printJurisdictionName">محكمة البليدة</div>
@@ -948,51 +943,7 @@ $user_json = json_encode($_SESSION['user'], JSON_UNESCAPED_UNICODE);
   </div>
 
 
-  <!-- ==================== PDF EXPORT CAPTURE TEMPLATE (HIDDEN FOR SCREEN) ==================== -->
-  <div id="pdfPrintTemplate" class="d-none bg-white p-4"
-    style="width: 1100px; color: #000000; direction: rtl; text-align: right;">
 
-    <!-- PDF Header content -->
-    <div class="border-bottom border-3 border-dark pb-4 mb-4">
-      <div class="row align-items-start">
-        <div class="col-8">
-          <h2 class="fw-black mb-1">منظمة محامي البليدة</h2>
-          <h5 class="fw-bold mb-1">الجهة القضائية: <span id="pdfJurisdictionName">محكمة البليدة</span></h5>
-          <h6 class="fw-bold mb-3">القسم / الغرفة: <span id="pdfJurisdictionSubEntity">قسم الجنح</span></h6>
-          <p class="text-sm fw-bold text-muted mt-2">تاريخ الجلسة: <span id="pdfSessionDate">15-06-2026</span></p>
-        </div>
-
-        <div class="col-4 d-flex flex-column align-items-end gap-2">
-          <img src="logo.png" alt="Logo" style="width: 80px;">
-          <div class="d-flex flex-column align-items-center gap-1 mt-1">
-            <div id="pdfQrCodeContainer"></div>
-            <small style="font-size: 8px; font-weight: bold; color: #555555;">تحقق من صحة القائمة</small>
-          </div>
-        </div>
-      </div>
-
-      <div class="text-center mt-3">
-        <h2 class="fw-black text-decoration-underline" style="font-size: 26px;">قائمة التسبيقات والتأجيلات</h2>
-      </div>
-    </div>
-
-    <!-- PDF table content -->
-    <table class="table text-right border" style="border: 2px solid #000000 !important; width: 100%;">
-      <thead>
-        <tr class="bg-light">
-          <th style="border: 1px solid #000000 !important; padding: 10px; width: 8%;">الترتيب</th>
-          <th style="border: 1px solid #000000 !important; padding: 10px; width: 25%;">الأستاذ</th>
-          <th style="border: 1px solid #000000 !important; padding: 10px; width: 27%;">الأطراف</th>
-          <th style="border: 1px solid #000000 !important; padding: 10px; width: 15%;">رقم القضية</th>
-          <th style="border: 1px solid #000000 !important; padding: 10px; width: 15%;">سنة اليمين</th>
-          <th style="border: 1px solid #000000 !important; padding: 10px; width: 10%;">الغرض</th>
-        </tr>
-      </thead>
-      <tbody id="pdfPrintTableBody">
-        <!-- dynamic rows -->
-      </tbody>
-    </table>
-  </div>
 
 
   <!-- ==================== EXTERNAL JS LIBRARIES ==================== -->

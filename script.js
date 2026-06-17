@@ -1706,7 +1706,7 @@ function clearCurrentList() {
     });
 }
 
-// PDF Download export using html2pdf
+// PDF Download export using html2pdf - generates from officialPrintTemplate
 function handleDownloadPDF() {
     const listToProcess = currentTab === 'archive' ? archiveRequests : requests;
     const finalRequests = processRequests(listToProcess);
@@ -1716,76 +1716,66 @@ function handleDownloadPDF() {
         return;
     }
 
-    // Scroll to top
-    window.scrollTo(0, 0);
+    // Ensure the print template is populated with latest data
+    // (renderRequestsTable already does this, but force a refresh here)
+    const printSessionDateEl = document.getElementById('printSessionDate');
+    const printCenterSubTitleEl = document.getElementById('printCenterSubTitle');
+    const printJurisdictionNameEl = document.getElementById('printJurisdictionName');
+    const printJurisdictionSubEntityEl = document.getElementById('printJurisdictionSubEntity');
+    const printTableBodyEl = document.getElementById('printTableBody');
 
-    const pdfTarget = document.getElementById('pdfPrintTemplate');
-    const headerContent = document.getElementById('pdfPrintHeader');
-    const tableBody = document.getElementById('pdfPrintTableBody');
+    if (printSessionDateEl) printSessionDateEl.innerText = selectedDate.replace(/-/g, '/');
+    if (printCenterSubTitleEl) printCenterSubTitleEl.innerText = `*** مندوبية ${currentJurisdiction.name} ***`;
+    if (printJurisdictionNameEl) printJurisdictionNameEl.innerText = currentJurisdiction.name;
+    if (printJurisdictionSubEntityEl) printJurisdictionSubEntityEl.innerText = currentJurisdiction.subEntity;
 
-    // Populate header details
-    document.getElementById('pdfJurisdictionName').innerText = currentJurisdiction.name;
-    document.getElementById('pdfJurisdictionSubEntity').innerText = currentJurisdiction.subEntity;
-    document.getElementById('pdfSessionDate').innerText = new Date(selectedDate).toLocaleDateString('ar-DZ', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-    // Populate QR values
-    document.getElementById('pdfQrCodeContainer').innerHTML = '';
-    new QRCode(document.getElementById('pdfQrCodeContainer'), {
-        text: window.location.href,
-        width: 60,
-        height: 60
-    });
-
-    // Populate print table rows
-    tableBody.innerHTML = '';
-    
-    let seenPurpose = null;
-
-    finalRequests.forEach((req, idx) => {
-        if (req.purpose !== seenPurpose && currentTab !== 'archive') {
-            seenPurpose = req.purpose;
-            const breakTr = document.createElement('tr');
-            breakTr.className = 'print-bg-slate bg-light text-center font-weight-bold';
-            breakTr.innerHTML = `
-                <td colspan="6" class="py-2 text-xs font-bold text-muted border-top border-bottom">
-                    ${req.purpose === 'delay' ? '--- قسم التأجيلات ---' : '--- قسم التسبيقات ---'}
-                </td>
+    if (printTableBodyEl) {
+        printTableBodyEl.innerHTML = '';
+        finalRequests.forEach((req, idx) => {
+            const indexText = String(idx + 1).padStart(2, '0');
+            const oathText = req.purpose === 'delay' ? 'تأجيل' : (req.oathDate || '—');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="width: 7%;">${indexText}</td>
+                <td style="width: 15%; font-family: monospace;">${req.caseNumber}</td>
+                <td style="width: 38%;">${req.parties}</td>
+                <td style="width: 25%; font-weight: 900;">${req.lawyerName}</td>
+                <td style="width: 15%;">${oathText}</td>
             `;
-            tableBody.appendChild(breakTr);
-        }
+            printTableBodyEl.appendChild(tr);
+        });
+    }
 
-        const purposeText = req.purpose === 'delay' ? 'تأجيل' : 'تسبيق';
+    const pdfTarget = document.getElementById('officialPrintTemplate');
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="width: 8%; text-align: center;">${idx + 1}</td>
-            <td style="width: 25%; font-weight: bold;">${req.lawyerName}</td>
-            <td style="width: 27%;">${req.parties}</td>
-            <td style="width: 15%; font-family: monospace;">${req.caseNumber}</td>
-            <td style="width: 15%;">${req.oathDate}</td>
-            <td style="width: 10%; text-align: center;">${purposeText}</td>
-        `;
-        tableBody.appendChild(tr);
-    });
+    // html2canvas cannot capture off-screen elements.
+    // Temporarily bring the element on-screen at top-left, above everything.
+    const savedStyle = pdfTarget.getAttribute('style') || '';
+    pdfTarget.setAttribute('style',
+        'position: fixed; left: 0; top: 0; width: 794px; z-index: 99999; background: #ffffff;'
+    );
 
-    // Renders print wrapper block temporary visible
-    pdfTarget.classList.remove('d-none');
+    const filename = `قائمة_${currentJurisdiction.name}_${currentJurisdiction.subEntity}_${selectedDate}.pdf`;
 
     const opt = {
-        margin: [10, 10, 10, 10],
-        filename: `قائمة_${currentJurisdiction.name}_${new Date(selectedDate).toLocaleDateString('ar-DZ')}.pdf`,
+        margin: 0,
+        filename,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
+        html2canvas: {
+            scale: 2,
             useCORS: true,
-            windowWidth: 1200
+            logging: false,
+            allowTaint: true,
+            windowWidth: 794
         },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
         pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
     };
 
     html2pdf().set(opt).from(pdfTarget).save().then(() => {
-        pdfTarget.classList.add('d-none');
+        // Restore off-screen positioning
+        pdfTarget.setAttribute('style', savedStyle);
+        showToast('تم تحميل الملف بنجاح', 'success');
     });
 }
 

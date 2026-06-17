@@ -5,25 +5,31 @@ session_start();
 require_once __DIR__ . '/db.php';
 
 // Helper function to generate UUID v4
-function generateUUID() {
+function generateUUID()
+{
     return sprintf(
         '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-        mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff),
         mt_rand(0, 0xffff),
         mt_rand(0, 0x0fff) | 0x4000,
         mt_rand(0, 0x3fff) | 0x8000,
-        mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff),
+        mt_rand(0, 0xffff)
     );
 }
 
 // Response helper
-function sendResponse($data, $status = 200) {
+function sendResponse($data, $status = 200)
+{
     http_response_code($status);
     echo json_code_response($data);
     exit;
 }
 
-function json_code_response($data) {
+function json_code_response($data)
+{
     return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 }
 
@@ -32,7 +38,8 @@ $input = json_decode(file_get_contents('php://input'), true) ?? [];
 $action = $_GET['action'] ?? $input['action'] ?? '';
 
 // Global Check: List Open setting
-function isListOpen() {
+function isListOpen()
+{
     $setting = dbFetch("SELECT setting_value FROM system_settings WHERE setting_key = 'is_list_open'");
     return $setting && $setting['setting_value'] === '1';
 }
@@ -148,7 +155,7 @@ switch ($action) {
             $ext = pathinfo($_FILES['idCard']['name'], PATHINFO_EXTENSION);
             $filename = generateUUID() . '.' . $ext;
             $targetPath = 'uploads/' . $filename;
-            
+
             if (move_uploaded_file($_FILES['idCard']['tmp_name'], $targetPath)) {
                 $idCardUrl = $targetPath;
             }
@@ -160,7 +167,7 @@ switch ($action) {
 
         $newUserId = generateUUID();
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        
+
         dbQuery("INSERT INTO users (id, first_name, last_name, email, phone, password, oath_date, is_syndicate_member, role, status, id_card_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'lawyer', 'pending', ?)", [
             $newUserId,
             $firstName,
@@ -184,20 +191,20 @@ switch ($action) {
     case 'get_requests':
         $isHistory = ($_GET['history'] ?? 'false') === 'true';
         $requests = dbFetchAll("SELECT * FROM requests WHERE is_archived = ? ORDER BY created_at DESC", [$isHistory ? 1 : 0]);
-        
+
         // Return type matching JS structures
-        $formatted = array_map(function($r) {
+        $formatted = array_map(function ($r) {
             return [
                 'id' => $r['id'],
                 'lawyerName' => $r['lawyer_name'],
                 'oathDate' => $r['oath_date'],
-                'isSyndicateMember' => (bool)$r['is_syndicate_member'],
+                'isSyndicateMember' => (bool) $r['is_syndicate_member'],
                 'caseNumber' => $r['case_number'],
                 'parties' => $r['parties'],
                 'purpose' => $r['purpose'],
-                'createdAt' => (float)$r['created_at'],
+                'createdAt' => (float) $r['created_at'],
                 'sessionDate' => $r['session_date'],
-                'isColleague' => (bool)$r['is_colleague'],
+                'isColleague' => (bool) $r['is_colleague'],
                 'jurisdiction' => [
                     'type' => $r['jurisdiction_type'],
                     'name' => $r['jurisdiction_name'],
@@ -212,19 +219,20 @@ switch ($action) {
         break;
 
     case 'add_request':
-        if (!isset($_SESSION['user'])) sendResponse(['error' => 'غير مصرح'], 401);
+        if (!isset($_SESSION['user']))
+            sendResponse(['error' => 'غير مصرح'], 401);
         $user = $_SESSION['user'];
 
         // Validation for session/roles and constraints
         $now = new DateTime();
-        $day = (int)$now->format('w'); // 0 (Sunday) to 6 (Saturday)
-        
+        $day = (int) $now->format('w'); // 0 (Sunday) to 6 (Saturday)
+
         // Weekend constraint (Friday=5, Saturday=6 in original React logic, but let's check PHP: w is 0 to 6, Friday is 5, Saturday is 6)
         if (($day == 5 || $day == 6) && $user['role'] === 'lawyer') {
             sendResponse(['error' => 'عذراً، لا يوجد استخراج للقضايا يومي الجمعة والسبت.'], 400);
         }
 
-        $currentTime = (int)$now->format('H') + ((int)$now->format('i') / 60);
+        $currentTime = (int) $now->format('H') + ((int) $now->format('i') / 60);
         if (($currentTime < 6.0 || $currentTime >= 14.5) && $user['role'] === 'lawyer') {
             // sendResponse(['error' => 'عذراً، القائمة مغلقة حالياً. تفتح القائمة من الساعة 06:00 صباحاً إلى غاية الساعة 14:30 مساءً.'], 400);
         }
@@ -237,13 +245,13 @@ switch ($action) {
         $parties = $input['parties'] ?? '';
         $purpose = $input['purpose'] ?? 'delay';
         $sessionDate = $input['sessionDate'] ?? '';
-        $isColleague = (bool)($input['isColleague'] ?? false);
-        
+        $isColleague = (bool) ($input['isColleague'] ?? false);
+
         // Colleague details
         $colleagueFirstName = $input['colleagueFirstName'] ?? '';
         $colleagueLastName = $input['colleagueLastName'] ?? '';
         $colleagueOathDate = $input['colleagueOathDate'] ?? '';
-        $colleagueIsSyndicateMember = (bool)($input['colleagueIsSyndicateMember'] ?? false);
+        $colleagueIsSyndicateMember = (bool) ($input['colleagueIsSyndicateMember'] ?? false);
 
         // Current Jurisdiction details
         $jurType = $input['jurisdiction']['type'] ?? 'court';
@@ -251,7 +259,7 @@ switch ($action) {
         $jurSub = $input['jurisdiction']['subEntity'] ?? '';
 
         // Validate Case Number formatting: e.g. "26-1024" or "25-392"
-        $currentYear = (int)date('y');
+        $currentYear = (int) date('y');
         $prevYear = $currentYear - 1;
         $pattern = "/^(" . $currentYear . "|" . $prevYear . ")-\d{1,5}$/";
         if (!preg_match($pattern, $caseNumber)) {
@@ -284,7 +292,8 @@ switch ($action) {
         break;
 
     case 'edit_request':
-        if (!isset($_SESSION['user'])) sendResponse(['error' => 'غير مصرح'], 401);
+        if (!isset($_SESSION['user']))
+            sendResponse(['error' => 'غير مصرح'], 401);
         $user = $_SESSION['user'];
 
         $id = $input['id'] ?? '';
@@ -293,13 +302,15 @@ switch ($action) {
         $purpose = $input['purpose'] ?? 'delay';
 
         $req = dbFetch("SELECT * FROM requests WHERE id = ?", [$id]);
-        if (!$req) sendResponse(['error' => 'الطلب غير موجود'], 404);
+        if (!$req)
+            sendResponse(['error' => 'الطلب غير موجود'], 404);
 
         $canEdit = ($user['role'] === 'admin' || $user['role'] === 'delegate' || $req['creator_id'] === $user['id']);
-        if (!$canEdit) sendResponse(['error' => 'لا تملك الصلاحية لتعديل هذا الطلب'], 403);
+        if (!$canEdit)
+            sendResponse(['error' => 'لا تملك الصلاحية لتعديل هذا الطلب'], 403);
 
         // Validate Case Number
-        $currentYear = (int)date('y');
+        $currentYear = (int) date('y');
         $prevYear = $currentYear - 1;
         $pattern = "/^(" . $currentYear . "|" . $prevYear . ")-\d{1,5}$/";
         if (!preg_match($pattern, $caseNumber)) {
@@ -311,15 +322,18 @@ switch ($action) {
         break;
 
     case 'delete_request':
-        if (!isset($_SESSION['user'])) sendResponse(['error' => 'غير مصرح'], 401);
+        if (!isset($_SESSION['user']))
+            sendResponse(['error' => 'غير مصرح'], 401);
         $user = $_SESSION['user'];
 
         $id = $input['id'] ?? $_GET['id'] ?? '';
         $req = dbFetch("SELECT * FROM requests WHERE id = ?", [$id]);
-        if (!$req) sendResponse(['error' => 'الطلب غير موجود'], 404);
+        if (!$req)
+            sendResponse(['error' => 'الطلب غير موجود'], 404);
 
         $canDelete = ($user['role'] === 'admin' || $user['role'] === 'delegate' || $req['creator_id'] === $user['id']);
-        if (!$canDelete) sendResponse(['error' => 'لا تملك الصلاحية لحذف هذا الطلب'], 403);
+        if (!$canDelete)
+            sendResponse(['error' => 'لا تملك الصلاحية لحذف هذا الطلب'], 403);
 
         dbQuery("DELETE FROM requests WHERE id = ?", [$id]);
         sendResponse(['success' => true]);
@@ -348,7 +362,7 @@ switch ($action) {
         $courts = array_column(dbFetchAll("SELECT name FROM courts ORDER BY id ASC"), 'name');
         $sections = array_column(dbFetchAll("SELECT name FROM sections ORDER BY id ASC"), 'name');
         $chambers = array_column(dbFetchAll("SELECT name FROM chambers ORDER BY id ASC"), 'name');
-        
+
         // Court Mapping to Councils
         $courtsDb = dbFetchAll("SELECT name, council_name FROM courts ORDER BY id ASC");
         $mapping = [];
@@ -381,9 +395,11 @@ switch ($action) {
         break;
 
     case 'add_council':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $name = trim($input['name'] ?? '');
-        if (empty($name)) sendResponse(['error' => 'الاسم مطلوب'], 400);
+        if (empty($name))
+            sendResponse(['error' => 'الاسم مطلوب'], 400);
 
         try {
             dbQuery("INSERT INTO councils (name) VALUES (?)", [$name]);
@@ -394,7 +410,8 @@ switch ($action) {
         break;
 
     case 'delete_council':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $name = $input['name'] ?? '';
         dbQuery("DELETE FROM councils WHERE name = ?", [$name]);
         // Also cascade delete courts belonging to it
@@ -403,10 +420,12 @@ switch ($action) {
         break;
 
     case 'add_court':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $name = trim($input['name'] ?? '');
         $council = trim($input['council'] ?? '');
-        if (empty($name) || empty($council)) sendResponse(['error' => 'البيانات ناقصة'], 400);
+        if (empty($name) || empty($council))
+            sendResponse(['error' => 'البيانات ناقصة'], 400);
 
         try {
             dbQuery("INSERT INTO courts (name, council_name) VALUES (?, ?)", [$name, $council]);
@@ -417,16 +436,19 @@ switch ($action) {
         break;
 
     case 'delete_court':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $name = $input['name'] ?? '';
         dbQuery("DELETE FROM courts WHERE name = ?", [$name]);
         sendResponse(['success' => true]);
         break;
 
     case 'add_section':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $name = trim($input['name'] ?? '');
-        if (empty($name)) sendResponse(['error' => 'الاسم مطلوب'], 400);
+        if (empty($name))
+            sendResponse(['error' => 'الاسم مطلوب'], 400);
 
         try {
             dbQuery("INSERT INTO sections (name) VALUES (?)", [$name]);
@@ -437,16 +459,19 @@ switch ($action) {
         break;
 
     case 'delete_section':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $name = $input['name'] ?? '';
         dbQuery("DELETE FROM sections WHERE name = ?", [$name]);
         sendResponse(['success' => true]);
         break;
 
     case 'add_chamber':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $name = trim($input['name'] ?? '');
-        if (empty($name)) sendResponse(['error' => 'الاسم مطلوب'], 400);
+        if (empty($name))
+            sendResponse(['error' => 'الاسم مطلوب'], 400);
 
         try {
             dbQuery("INSERT INTO chambers (name) VALUES (?)", [$name]);
@@ -457,7 +482,8 @@ switch ($action) {
         break;
 
     case 'delete_chamber':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $name = $input['name'] ?? '';
         dbQuery("DELETE FROM chambers WHERE name = ?", [$name]);
         sendResponse(['success' => true]);
@@ -465,35 +491,41 @@ switch ($action) {
 
     case 'get_announcements':
         $announcements = dbFetchAll("SELECT * FROM announcements ORDER BY created_at DESC");
-        $formatted = array_map(function($a) {
+        $formatted = array_map(function ($a) {
             return [
                 'id' => $a['id'],
                 'text' => $a['text'],
                 'authorName' => $a['author_name'],
-                'isActive' => (bool)$a['is_active'],
-                'createdAt' => (float)$a['created_at']
+                'isActive' => (bool) $a['is_active'],
+                'createdAt' => (float) $a['created_at']
             ];
         }, $announcements);
         sendResponse($formatted);
         break;
 
     case 'add_announcement':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $text = trim($input['text'] ?? '');
-        if (empty($text)) sendResponse(['error' => 'نص الإعلان مطلوب'], 400);
+        if (empty($text))
+            sendResponse(['error' => 'نص الإعلان مطلوب'], 400);
 
         $id = generateUUID();
         $authorName = "الأستاذ " . $_SESSION['user']['last_name'] . " " . $_SESSION['user']['first_name'];
         $created_timestamp = round(microtime(true) * 1000);
 
         dbQuery("INSERT INTO announcements (id, text, author_name, is_active, created_at) VALUES (?, ?, ?, 1, ?)", [
-            $id, $text, $authorName, $created_timestamp
+            $id,
+            $text,
+            $authorName,
+            $created_timestamp
         ]);
         sendResponse(['success' => true]);
         break;
 
     case 'toggle_announcement':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $id = $input['id'] ?? '';
         $active = ($input['isActive'] ?? false) ? 1 : 0;
         dbQuery("UPDATE announcements SET is_active = ? WHERE id = ?", [$active, $id]);
@@ -501,17 +533,19 @@ switch ($action) {
         break;
 
     case 'delete_announcement':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $id = $input['id'] ?? $_GET['id'] ?? '';
         dbQuery("DELETE FROM announcements WHERE id = ?", [$id]);
         sendResponse(['success' => true]);
         break;
 
     case 'get_users':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $users = dbFetchAll("SELECT id, first_name, last_name, email, phone, oath_date, is_syndicate_member, role, status, id_card_url FROM users ORDER BY created_at DESC");
         // Format to camelCase for client compatibility
-        $formatted = array_map(function($u) {
+        $formatted = array_map(function ($u) {
             return [
                 'id' => $u['id'],
                 'firstName' => $u['first_name'],
@@ -519,7 +553,7 @@ switch ($action) {
                 'email' => $u['email'] ?? '',
                 'phone' => $u['phone'] ?? '',
                 'oathDate' => $u['oath_date'],
-                'isSyndicateMember' => (bool)$u['is_syndicate_member'],
+                'isSyndicateMember' => (bool) $u['is_syndicate_member'],
                 'role' => $u['role'],
                 'status' => $u['status'],
                 'idCardUrl' => $u['id_card_url']
@@ -529,16 +563,18 @@ switch ($action) {
         break;
 
     case 'update_user_status':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $userId = $input['id'] ?? '';
         $status = $input['status'] ?? 'approved';
-        
+
         dbQuery("UPDATE users SET status = ? WHERE id = ?", [$status, $userId]);
         sendResponse(['success' => true]);
         break;
 
     case 'add_user':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $lastName = trim($input['lastName'] ?? '');
         $firstName = trim($input['firstName'] ?? '');
         $email = trim(strtolower($input['email'] ?? ''));
@@ -547,7 +583,7 @@ switch ($action) {
         $role = $input['role'] ?? 'lawyer';
         $status = $input['status'] ?? 'approved';
         $oathDate = $input['oathDate'] ?? '';
-        $isSyndicateMember = (bool)($input['isSyndicateMember'] ?? false);
+        $isSyndicateMember = (bool) ($input['isSyndicateMember'] ?? false);
 
         if (empty($lastName) || empty($firstName) || empty($password)) {
             sendResponse(['error' => 'الاسم واللقب وكلمة السر حقول مطلوبة'], 400);
@@ -569,7 +605,7 @@ switch ($action) {
 
         $id = generateUUID();
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        
+
         dbQuery("INSERT INTO users (id, first_name, last_name, email, phone, password, oath_date, is_syndicate_member, role, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
             $id,
             $firstName,
@@ -586,7 +622,8 @@ switch ($action) {
         break;
 
     case 'edit_user':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $id = $input['id'] ?? '';
         $lastName = trim($input['lastName'] ?? '');
         $firstName = trim($input['firstName'] ?? '');
@@ -596,7 +633,7 @@ switch ($action) {
         $role = $input['role'] ?? 'lawyer';
         $status = $input['status'] ?? 'approved';
         $oathDate = $input['oathDate'] ?? '';
-        $isSyndicateMember = (bool)($input['isSyndicateMember'] ?? false);
+        $isSyndicateMember = (bool) ($input['isSyndicateMember'] ?? false);
 
         if (empty($id) || empty($lastName) || empty($firstName)) {
             sendResponse(['error' => 'الاسم واللقب والمعرف حقول مطلوبة'], 400);
@@ -619,26 +656,45 @@ switch ($action) {
         if (!empty($password)) {
             $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
             dbQuery("UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?, password = ?, oath_date = ?, is_syndicate_member = ?, role = ?, status = ? WHERE id = ?", [
-                $firstName, $lastName, $email ?: null, $phone ?: null, $hashedPassword, $isSyndicateMember ? 'عضو نقابة' : $oathDate, $isSyndicateMember ? 1 : 0, $role, $status, $id
+                $firstName,
+                $lastName,
+                $email ?: null,
+                $phone ?: null,
+                $hashedPassword,
+                $isSyndicateMember ? 'عضو نقابة' : $oathDate,
+                $isSyndicateMember ? 1 : 0,
+                $role,
+                $status,
+                $id
             ]);
         } else {
             dbQuery("UPDATE users SET first_name = ?, last_name = ?, email = ?, phone = ?, oath_date = ?, is_syndicate_member = ?, role = ?, status = ? WHERE id = ?", [
-                $firstName, $lastName, $email ?: null, $phone ?: null, $isSyndicateMember ? 'عضو نقابة' : $oathDate, $isSyndicateMember ? 1 : 0, $role, $status, $id
+                $firstName,
+                $lastName,
+                $email ?: null,
+                $phone ?: null,
+                $isSyndicateMember ? 'عضو نقابة' : $oathDate,
+                $isSyndicateMember ? 1 : 0,
+                $role,
+                $status,
+                $id
             ]);
         }
         sendResponse(['success' => true]);
         break;
 
     case 'delete_user':
-        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') sendResponse(['error' => 'غير مصرح'], 403);
+        if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin')
+            sendResponse(['error' => 'غير مصرح'], 403);
         $id = $input['id'] ?? $_GET['id'] ?? '';
-        if (empty($id)) sendResponse(['error' => 'المعرف مطلوب'], 400);
+        if (empty($id))
+            sendResponse(['error' => 'المعرف مطلوب'], 400);
 
         // Don't let admin delete their own account
         if ($id === $_SESSION['user']['id']) {
             sendResponse(['error' => 'لا يمكنك حذف حسابك الشخصي أثناء تسجيل الدخول به'], 400);
         }
-        
+
         // delete user id card
         $user = dbFetch("SELECT * FROM users WHERE id = ?", [$id]);
         if ($user) {
