@@ -1,4 +1,4 @@
-// State Management
+﻿// State Management
 let currentUser = null;
 let requests = [];
 let archiveRequests = [];
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentUser) {
             initApp();
         } else {
-            window.location.href = 'index.php';
+            window.location.href = '../index.php';
         }
     });
 
@@ -98,24 +98,24 @@ async function checkAuth() {
         return;
     }
     try {
-        const res = await fetch('api.php?action=auth_check');
+        const res = await fetch('../api.php?action=auth_check');
         const data = await res.json();
         if (data.authenticated) {
             currentUser = data.user;
         } else {
             currentUser = null;
-            window.location.href = 'index.php';
+            window.location.href = '../index.php';
         }
     } catch (e) {
         console.error('Auth check error', e);
-        window.location.href = 'index.php';
+        window.location.href = '../index.php';
     }
 }
 
 // Fetch all settings, lists, and active status
 async function fetchSettings() {
     try {
-        const res = await fetch(`api.php?action=get_settings&t=${Date.now()}`);
+        const res = await fetch(`../api.php?action=get_settings&t=${Date.now()}`);
         systemSettings = await res.json();
         
         // Synchronize selected council and names
@@ -134,7 +134,7 @@ async function fetchSettings() {
 // Fetch Active Requests or Archives
 async function fetchRequests(isHistory = false) {
     try {
-        const res = await fetch(`api.php?action=get_requests&history=${isHistory}&t=${Date.now()}`);
+        const res = await fetch(`../api.php?action=get_requests&history=${isHistory}&t=${Date.now()}`);
         const data = await res.json();
         if (isHistory) {
             archiveRequests = data;
@@ -150,7 +150,7 @@ async function fetchRequests(isHistory = false) {
 // Fetch Announcements
 async function fetchAnnouncements() {
     try {
-        const res = await fetch(`api.php?action=get_announcements&t=${Date.now()}`);
+        const res = await fetch(`../api.php?action=get_announcements&t=${Date.now()}`);
         announcements = await res.json();
         renderAnnouncements();
         updateNotificationBadge();
@@ -163,7 +163,7 @@ async function fetchAnnouncements() {
 async function fetchUsers() {
     if (currentUser.role !== 'admin') return;
     try {
-        const res = await fetch(`api.php?action=get_users&t=${Date.now()}`);
+        const res = await fetch(`../api.php?action=get_users&t=${Date.now()}`);
         allUsers = await res.json();
         renderUsersList();
     } catch (e) {
@@ -967,7 +967,7 @@ function initEventListeners() {
             errDiv.classList.add('d-none');
 
             try {
-                const res = await fetch('api.php?action=login', {
+                const res = await fetch('../api.php?action=login', {
                     method: 'POST',
                     body: formData
                 });
@@ -997,7 +997,7 @@ function initEventListeners() {
             errDiv.classList.add('d-none');
 
             try {
-                const res = await fetch('api.php?action=register', {
+                const res = await fetch('../api.php?action=register', {
                     method: 'POST',
                     body: formData
                 });
@@ -1142,7 +1142,7 @@ function initEventListeners() {
                 payload.colleagueOathDate = document.getElementById('colleagueOathDate').value;
             }
 
-            const url = editingRequest ? 'api.php?action=edit_request' : 'api.php?action=add_request';
+            const url = editingRequest ? '../api.php?action=edit_request' : '../api.php?action=add_request';
             if (editingRequest) {
                 payload.id = editingRequest.id;
             }
@@ -1196,9 +1196,9 @@ function initEventListeners() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
-            await fetch('api.php?action=logout');
+            await fetch('../api.php?action=logout');
             currentUser = null;
-            window.location.href = 'index.php';
+            window.location.href = '../index.php';
         });
     }
 }
@@ -1287,7 +1287,7 @@ function deleteRequestPrompt(id, isHistory = false) {
     const msg = isHistory ? 'هل تريد حذف هذا السجل نهائياً من الأرشيف؟' : 'هل أنت متأكد من الحذف؟';
     showConfirm(msg, async () => {
         try {
-            const res = await fetch(`api.php?action=delete_request&id=${id}`);
+            const res = await fetch(`../api.php?action=delete_request&id=${id}`);
             const data = await res.json();
             if (res.ok) {
                 showToast('تم الحذف بنجاح', 'success');
@@ -1337,7 +1337,7 @@ function showToast(message, type = 'success') {
 // User Approvals actions
 async function updateUserStatus(id, status) {
     try {
-        const res = await fetch('api.php?action=update_user_status', {
+        const res = await fetch('../api.php?action=update_user_status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, status })
@@ -1449,7 +1449,7 @@ function openUserModal(userObj = null) {
         const isEditing = !!editingUser;
         if (isEditing) payload.id = editingUser.id;
 
-        const url = isEditing ? 'api.php?action=edit_user' : 'api.php?action=add_user';
+        const url = isEditing ? '../api.php?action=edit_user' : '../api.php?action=add_user';
 
         try {
             const res = await fetch(url, {
@@ -1491,7 +1491,7 @@ function editUserPrompt(id) {
 function deleteUserPrompt(id, name) {
     showConfirm(`هل أنت متأكد من حذف حساب الأستاذ ${name} نهائياً؟`, async () => {
         try {
-            const res = await fetch('api.php?action=delete_user', {
+            const res = await fetch('../api.php?action=delete_user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id })
@@ -1527,7 +1527,7 @@ function closeIDCardViewer() {
 // Settings changes handlers
 async function updateAdminListStatus(isOpen) {
     try {
-        const res = await fetch('api.php?action=update_list_status', {
+        const res = await fetch('../api.php?action=update_list_status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ isOpen })
@@ -1548,21 +1548,21 @@ async function addAdminSettingItem(type) {
 
     if (type === 'council') {
         inputEl = document.getElementById('newCouncilInput');
-        url = 'api.php?action=add_council';
+        url = '../api.php?action=add_council';
         payload.name = inputEl.value;
     } else if (type === 'court') {
         inputEl = document.getElementById('newCourtInput');
         const councilSelect = document.getElementById('newCourtCouncilSelect');
-        url = 'api.php?action=add_court';
+        url = '../api.php?action=add_court';
         payload.name = inputEl.value;
         payload.council = councilSelect.value;
     } else if (type === 'section') {
         inputEl = document.getElementById('newSectionInput');
-        url = 'api.php?action=add_section';
+        url = '../api.php?action=add_section';
         payload.name = inputEl.value;
     } else if (type === 'chamber') {
         inputEl = document.getElementById('newChamberInput');
-        url = 'api.php?action=add_chamber';
+        url = '../api.php?action=add_chamber';
         payload.name = inputEl.value;
     }
 
@@ -1592,10 +1592,10 @@ async function addAdminSettingItem(type) {
 
 async function deleteAdminSettingItem(type, name) {
     let url;
-    if (type === 'council') url = 'api.php?action=delete_council';
-    else if (type === 'court') url = 'api.php?action=delete_court';
-    else if (type === 'section') url = 'api.php?action=delete_section';
-    else if (type === 'chamber') url = 'api.php?action=delete_chamber';
+    if (type === 'council') url = '../api.php?action=delete_council';
+    else if (type === 'court') url = '../api.php?action=delete_court';
+    else if (type === 'section') url = '../api.php?action=delete_section';
+    else if (type === 'chamber') url = '../api.php?action=delete_chamber';
 
     showConfirm(`هل أنت متأكد من حذف ${name}؟`, async () => {
         try {
@@ -1621,7 +1621,7 @@ async function postAnnouncement() {
     if (!text.trim()) return;
 
     try {
-        const res = await fetch('api.php?action=add_announcement', {
+        const res = await fetch('../api.php?action=add_announcement', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text })
@@ -1646,7 +1646,7 @@ async function postAnnouncement() {
 
 async function toggleAnnouncementStatus(id, isActive) {
     try {
-        const res = await fetch('api.php?action=toggle_announcement', {
+        const res = await fetch('../api.php?action=toggle_announcement', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, isActive })
@@ -1664,7 +1664,7 @@ async function toggleAnnouncementStatus(id, isActive) {
 async function deleteAnnouncement(id) {
     showConfirm('هل أنت متأكد من حذف هذا الإعلان؟', async () => {
         try {
-            const res = await fetch(`api.php?action=delete_announcement&id=${id}`);
+            const res = await fetch(`../api.php?action=delete_announcement&id=${id}`);
             if (res.ok) {
                 showToast('تم حذف الإعلان بنجاح', 'success');
                 await fetchAnnouncements();
@@ -1680,7 +1680,7 @@ async function deleteAnnouncement(id) {
 function archiveCurrentList() {
     showConfirm('هل تريد نقل القائمة الحالية إلى الأرشيف؟', async () => {
         try {
-            const res = await fetch('api.php?action=archive_requests');
+            const res = await fetch('../api.php?action=archive_requests');
             if (res.ok) {
                 showToast('تمت أرشفة القائمة بنجاح', 'success');
                 await fetchRequests(false);
@@ -1695,7 +1695,7 @@ function archiveCurrentList() {
 function clearCurrentList() {
     showConfirm('هل أنت متأكد من مسح القائمة بالكامل؟', async () => {
         try {
-            const res = await fetch('api.php?action=clear_requests');
+            const res = await fetch('../api.php?action=clear_requests');
             if (res.ok) {
                 showToast('تم مسح القائمة بنجاح', 'success');
                 await fetchRequests(false);

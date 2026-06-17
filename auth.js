@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await res.json();
                 
                 if (res.ok && data.success) {
-                    window.location.href = 'dashboard.php';
+                    window.location.href = 'dashboard/';
                 } else {
                     errDiv.innerText = data.error || 'خطأ غير معروف';
                     errDiv.classList.remove('d-none');
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    window.location.href = 'dashboard.php';
+                    window.location.href = 'dashboard/';
                 } else {
                     showToast('خطأ في دخول الزائر', 'error');
                 }
