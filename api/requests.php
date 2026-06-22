@@ -99,12 +99,12 @@ switch ($action) {
         $jurSub = $input['jurisdiction']['subEntity'] ?? '';
 
         // Validate Case Number formatting: e.g. "26-1024" or "25-392"
-        $currentYear = (int) date('y');
-        $prevYear = $currentYear - 1;
-        $pattern = "/^(" . $currentYear . "|" . $prevYear . ")-\d{1,5}$/";
-        if (!preg_match($pattern, $caseNumber)) {
-            sendResponse(['error' => "رقم القضية غير صحيح. يجب أن يكون بالتنسيق: السنة-رقم الملف (مثلاً: {$currentYear}-1234) وأن تكون السنة هي {$currentYear} أو {$prevYear}"], 400);
-        }
+        // $currentYear = (int) date('y');
+        // $prevYear = $currentYear - 1;
+        // $pattern = "/^(" . $currentYear . "|" . $prevYear . ")-\d{1,5}$/";
+        // if (!preg_match($pattern, $caseNumber)) {
+        //     sendResponse(['error' => "رقم القضية غير صحيح. يجب أن يكون بالتنسيق: السنة-رقم الملف (مثلاً: {$currentYear}-1234) وأن تكون السنة هي {$currentYear} أو {$prevYear}"], 400);
+        // }
 
         $lawyerName = "";
         $oathDate = "";
@@ -150,12 +150,12 @@ switch ($action) {
             sendResponse(['error' => 'لا تملك الصلاحية لتعديل هذا الطلب'], 403);
 
         // Validate Case Number
-        $currentYear = (int) date('y');
-        $prevYear = $currentYear - 1;
-        $pattern = "/^(" . $currentYear . "|" . $prevYear . ")-\d{1,5}$/";
-        if (!preg_match($pattern, $caseNumber)) {
-            sendResponse(['error' => "رقم القضية غير صحيح. يجب أن يكون بالتنسيق: السنة-رقم الملف (مثلاً: {$currentYear}-1234) وأن تكون السنة هي {$currentYear} أو {$prevYear}"], 400);
-        }
+        // $currentYear = (int) date('y');
+        // $prevYear = $currentYear - 1;
+        // $pattern = "/^(" . $currentYear . "|" . $prevYear . ")-\d{1,5}$/";
+        // if (!preg_match($pattern, $caseNumber)) {
+        //     sendResponse(['error' => "رقم القضية غير صحيح. يجب أن يكون بالتنسيق: السنة-رقم الملف (مثلاً: {$currentYear}-1234) وأن تكون السنة هي {$currentYear} أو {$prevYear}"], 400);
+        // }
 
         dbQuery("UPDATE requests SET case_number = ?, parties = ?, purpose = ? WHERE id = ?", [$caseNumber, $parties, $purpose, $id]);
         sendResponse(['success' => true]);

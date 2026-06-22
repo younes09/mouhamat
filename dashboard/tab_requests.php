@@ -147,14 +147,14 @@
             </button>
 
             <!-- Export formats -->
-            <button onclick="handleDownloadPDF()" class="btn btn-dark d-flex align-items-center gap-2 scale-active"
+            <button onclick="openPrintPage()" class="btn btn-dark d-flex align-items-center gap-2 scale-active"
               title="تنزيل كملف PDF">
               <i data-lucide="download" class="w-5 h-5"></i>
               تحميل PDF
             </button>
 
             <?php if ($_SESSION['user']['role'] === 'admin' || $_SESSION['user']['role'] === 'delegate'): ?>
-              <button onclick="handlePrint()" class="btn btn-light border d-flex align-items-center gap-2 scale-active"
+              <button onclick="openPrintPage()" class="btn btn-light border d-flex align-items-center gap-2 scale-active"
                 title="طباعة">
                 <i data-lucide="printer" class="w-5 h-5"></i>
                 طباعة

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'blida-lawyers-app-v2';
+const CACHE_NAME = 'blida-lawyers-app-v3';
 const ASSETS = [
   '/mouhamat/',
   '/mouhamat/index.php',
@@ -14,7 +14,6 @@ const ASSETS = [
   'https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css',
   'https://cdn.jsdelivr.net/npm/flatpickr',
   'https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js',
   'https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js'
 ];
 

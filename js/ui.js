@@ -276,51 +276,6 @@ function renderRequestsTable() {
         mobileContainer.appendChild(card);
     });
 
-    // Populate Official Print Template
-    const printSessionDateEl = document.getElementById('printSessionDate');
-    const printCenterSubTitleEl = document.getElementById('printCenterSubTitle');
-    const printJurisdictionNameEl = document.getElementById('printJurisdictionName');
-    const printJurisdictionSubEntityEl = document.getElementById('printJurisdictionSubEntity');
-    const printTableBodyEl = document.getElementById('printTableBody');
-
-    if (printSessionDateEl) {
-        printSessionDateEl.innerText = selectedDate.replace(/-/g, '/');
-    }
-    if (printCenterSubTitleEl) {
-        printCenterSubTitleEl.innerText = `*** مندوبية ${currentJurisdiction.name} ***`;
-    }
-    if (printJurisdictionNameEl) {
-        printJurisdictionNameEl.innerText = currentJurisdiction.name;
-    }
-    if (printJurisdictionSubEntityEl) {
-        printJurisdictionSubEntityEl.innerText = currentJurisdiction.subEntity;
-    }
-    if (printTableBodyEl) {
-        printTableBodyEl.innerHTML = '';
-        if (finalRequests.length === 0) {
-            printTableBodyEl.innerHTML = `
-                <tr>
-                    <td colspan="5" style="text-align: center; padding: 25px; font-weight: bold; color: #555555;">لا توجد طلبات مسجلة لهذه الجلسة</td>
-                </tr>
-            `;
-        } else {
-            finalRequests.forEach((req, idx) => {
-                const indexText = String(idx + 1).padStart(2, '0');
-                const oathText = req.purpose === 'delay' ? 'تأجيل' : (req.oathDate || '—');
-                
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="width: 7%;">${indexText}</td>
-                    <td class="font-monospace" style="width: 15%;">${req.caseNumber}</td>
-                    <td style="width: 38%;">${req.parties}</td>
-                    <td style="width: 25%;">${req.lawyerName}</td>
-                    <td style="width: 15%;">${oathText}</td>
-                `;
-                printTableBodyEl.appendChild(tr);
-            });
-        }
-    }
-
     if (window.lucide) lucide.createIcons();
 }
 
@@ -894,83 +849,14 @@ function closeIDCardViewer() {
     modal.classList.remove('d-flex');
 }
 
-// PDF Download export using html2pdf - generates from officialPrintTemplate
-function handleDownloadPDF() {
-    const listToProcess = currentTab === 'archive' ? archiveRequests : requests;
-    const finalRequests = processRequests(listToProcess);
-
-    if (finalRequests.length === 0) {
-        showToast('لا توجد طلبات لتنزيلها', 'error');
-        return;
-    }
-
-    // Ensure the print template is populated with latest data
-    // (renderRequestsTable already does this, but force a refresh here)
-    const printSessionDateEl = document.getElementById('printSessionDate');
-    const printCenterSubTitleEl = document.getElementById('printCenterSubTitle');
-    const printJurisdictionNameEl = document.getElementById('printJurisdictionName');
-    const printJurisdictionSubEntityEl = document.getElementById('printJurisdictionSubEntity');
-    const printTableBodyEl = document.getElementById('printTableBody');
-
-    if (printSessionDateEl) printSessionDateEl.innerText = selectedDate.replace(/-/g, '/');
-    if (printCenterSubTitleEl) printCenterSubTitleEl.innerText = `*** مندوبية ${currentJurisdiction.name} ***`;
-    if (printJurisdictionNameEl) printJurisdictionNameEl.innerText = currentJurisdiction.name;
-    if (printJurisdictionSubEntityEl) printJurisdictionSubEntityEl.innerText = currentJurisdiction.subEntity;
-
-    if (printTableBodyEl) {
-        printTableBodyEl.innerHTML = '';
-        finalRequests.forEach((req, idx) => {
-            const indexText = String(idx + 1).padStart(2, '0');
-            const oathText = req.purpose === 'delay' ? 'تأجيل' : (req.oathDate || '—');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="width: 7%;">${indexText}</td>
-                <td style="width: 15%; font-family: monospace;">${req.caseNumber}</td>
-                <td style="width: 38%;">${req.parties}</td>
-                <td style="width: 25%; font-weight: 900;">${req.lawyerName}</td>
-                <td style="width: 15%;">${oathText}</td>
-            `;
-            printTableBodyEl.appendChild(tr);
-        });
-    }
-
-    const pdfTarget = document.getElementById('officialPrintTemplate');
-
-    // html2canvas cannot capture off-screen elements.
-    // Temporarily bring the element on-screen at top-left, above everything.
-    const savedStyle = pdfTarget.getAttribute('style') || '';
-    pdfTarget.setAttribute('style',
-        'position: fixed; left: 0; top: 0; width: 794px; z-index: 99999; background: #ffffff;'
-    );
-
-    const filename = `قائمة_${currentJurisdiction.name}_${currentJurisdiction.subEntity}_${selectedDate}.pdf`;
-
-    const opt = {
-        margin: 0,
-        filename,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            allowTaint: true,
-            windowWidth: 794
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
-
-    html2pdf().set(opt).from(pdfTarget).save().then(() => {
-        // Restore off-screen positioning
-        pdfTarget.setAttribute('style', savedStyle);
-        showToast('تم تحميل الملف بنجاح', 'success');
+// Open standalone print page in a new tab with current jurisdiction + date
+function openPrintPage() {
+    const params = new URLSearchParams({
+        date:     selectedDate,
+        jur_type: currentJurisdiction.type,
+        jur_name: currentJurisdiction.name,
+        jur_sub:  currentJurisdiction.subEntity
     });
+    window.open(`../print.php?${params.toString()}`, '_blank');
 }
 
-// Print Handler
-function handlePrint() {
-    window.focus();
-    setTimeout(() => {
-        window.print();
-    }, 100);
-}

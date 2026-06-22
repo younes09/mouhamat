@@ -29,7 +29,6 @@ $user_json = json_encode($_SESSION['user'], JSON_UNESCAPED_UNICODE);
 
   <?php include_once 'modals.php'; ?>
   <?php include_once 'toast.php'; ?>
-  <?php include_once 'print_template.php'; ?>
   <?php include_once 'scripts.php'; ?>
 </body>
 
