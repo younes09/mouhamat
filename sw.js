@@ -1,10 +1,13 @@
-const CACHE_NAME = 'blida-lawyers-app-v1';
+const CACHE_NAME = 'blida-lawyers-app-v2';
 const ASSETS = [
   '/mouhamat/',
   '/mouhamat/index.php',
   '/mouhamat/manifest.json',
   '/mouhamat/style.css',
-  '/mouhamat/script.js',
+  '/mouhamat/js/state.js',
+  '/mouhamat/js/api.js',
+  '/mouhamat/js/ui.js',
+  '/mouhamat/js/app.js',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
   'https://unpkg.com/lucide@latest',

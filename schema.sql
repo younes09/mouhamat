@@ -80,7 +80,10 @@ CREATE TABLE IF NOT EXISTS `chambers` (
 
 -- Insert default system settings
 INSERT INTO `system_settings` (`setting_key`, `setting_value`) VALUES
-('is_list_open', '1')
+('is_list_open', '1'),
+('restricted_days', '5,6'),
+('start_time', '06:00'),
+('end_time', '14:30')
 ON DUPLICATE KEY UPDATE `setting_value` = VALUES(`setting_value`);
 
 -- Insert default councils

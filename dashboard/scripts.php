@@ -22,7 +22,10 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Local logic controllers -->
-  <script src="../script.js"></script>
+  <script src="../js/state.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/app.js"></script>
   <script>
     if (window.preinjectedUser) {
       currentUser = window.preinjectedUser;

@@ -14,6 +14,63 @@
           </div>
 
           <div class="row g-4">
+            <!-- Dynamic Constraints settings -->
+            <div class="col-12">
+              <div class="card p-3 border">
+                <h5 class="fw-bold text-sm mb-3 d-flex align-items-center gap-2 text-success">
+                  <i data-lucide="clock" class="w-4 h-4"></i>
+                  قوانين وقيود القائمة (للمحامين)
+                </h5>
+                <form id="constraintsForm" onsubmit="saveAdminConstraints(event)">
+                  <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                      <label class="form-label text-xs fw-bold text-muted mb-2">أوقات العمل اليومية (تفتح - تغلق)</label>
+                      <div class="d-flex gap-2 align-items-center">
+                        <input type="time" id="constraintStartTime" class="form-control form-control-sm form-input-custom" required>
+                        <span class="text-muted text-xs">إلى</span>
+                        <input type="time" id="constraintEndTime" class="form-control form-control-sm form-input-custom" required>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <label class="form-label text-xs fw-bold text-muted mb-2">أيام الإغلاق الأسبوعية (أيام الويكند المعطلة)</label>
+                      <div class="d-flex flex-wrap gap-2 pt-1">
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" id="day_0" value="0">
+                          <label class="form-check-label text-xs fw-bold" for="day_0">الأحد</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" id="day_1" value="1">
+                          <label class="form-check-label text-xs fw-bold" for="day_1">الإثنين</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" id="day_2" value="2">
+                          <label class="form-check-label text-xs fw-bold" for="day_2">الثلاثاء</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" id="day_3" value="3">
+                          <label class="form-check-label text-xs fw-bold" for="day_3">الأربعاء</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" id="day_4" value="4">
+                          <label class="form-check-label text-xs fw-bold" for="day_4">الخميس</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" id="day_5" value="5">
+                          <label class="form-check-label text-xs fw-bold text-danger" for="day_5">الجمعة</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="checkbox" id="day_6" value="6">
+                          <label class="form-check-label text-xs fw-bold text-danger" for="day_6">السبت</label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex justify-content-end mt-3 border-top pt-2">
+                    <button type="submit" class="btn btn-success btn-sm fw-bold px-3">حفظ القيود</button>
+                  </div>
+                </form>
+              </div>
+            </div>
             <!-- Councils settings -->
             <div class="col-12 col-md-6">
               <div class="card p-3 border">
