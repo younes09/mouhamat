@@ -2,6 +2,11 @@
 <html lang="ar" dir="rtl">
 
 <head>
+  <script>
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لوحة التحكم | منظمة محامي البليدة</title>

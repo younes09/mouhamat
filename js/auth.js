@@ -1,8 +1,38 @@
 // Authentication view logic (index.php)
 
+// Theme Control
+let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+function applyTheme() {
+    const darkToggle = document.getElementById('darkToggle');
+    if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        if (darkToggle) darkToggle.innerHTML = '<i data-lucide="sun" class="w-5 h-5"></i>';
+    } else {
+        document.documentElement.classList.remove('dark');
+        if (darkToggle) darkToggle.innerHTML = '<i data-lucide="moon" class="w-5 h-5"></i>';
+    }
+    if (window.lucide) lucide.createIcons();
+}
+
+function toggleDarkMode() {
+    isDarkMode = !isDarkMode;
+    localStorage.setItem('darkMode', isDarkMode);
+    applyTheme();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.dir = 'rtl';
     document.documentElement.lang = 'ar';
+    
+    // Apply theme
+    applyTheme();
+
+    // Theme toggling
+    const darkToggle = document.getElementById('darkToggle');
+    if (darkToggle) {
+        darkToggle.addEventListener('click', toggleDarkMode);
+    }
     
     // Lucide Icons initialization
     if (window.lucide) lucide.createIcons();

@@ -27,9 +27,9 @@
             </span>
           </button>
 
-          <!-- Theme Toggle Button (show message on click this future is not rady yet , work in progress) -->
+          <!-- Theme Toggle Button -->
           <button type="button" id="darkToggle" class="btn btn-light p-2 rounded-3 border-0 text-muted"
-            title="الوضع الليلي" disabled>
+            title="الوضع الليلي">
             <i data-lucide="moon" class="w-5 h-5"></i>
           </button>
 

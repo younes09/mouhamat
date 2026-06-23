@@ -8,6 +8,11 @@ if (isset($_SESSION['user'])) {
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <script>
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.documentElement.classList.add('dark');
+    }
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>دخول | منظمة محامي البليدة</title>
@@ -32,6 +37,13 @@ if (isset($_SESSION['user'])) {
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
+
+  <!-- Floating Dark Mode Toggle Button -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 1000;">
+    <button type="button" id="darkToggle" class="btn btn-light p-2 rounded-3 border-0 text-muted shadow-sm" title="الوضع الليلي">
+      <i data-lucide="moon" class="w-5 h-5"></i>
+    </button>
+  </div>
 
   <!-- ==================== LOGIN / REGISTRATION CONTAINER ==================== -->
   <div id="loginContainer" class="min-vh-screen d-flex align-items-center justify-content-center p-4 fade-in">
