@@ -3,7 +3,7 @@ const ASSETS = [
   '/mouhamat/',
   '/mouhamat/index.php',
   '/mouhamat/manifest.json',
-  '/mouhamat/style.css',
+  '/mouhamat/assets/css/style.css',
   '/mouhamat/js/state.js',
   '/mouhamat/js/api.js',
   '/mouhamat/js/ui.js',

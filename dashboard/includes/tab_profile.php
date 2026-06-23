@@ -4,7 +4,7 @@
           <div class="d-flex flex-col flex-sm-row align-items-center gap-4 border-bottom pb-4 mb-4">
             <div class="bg-light border rounded-3 p-3 overflow-hidden d-flex align-items-center justify-content-center"
               style="width: 100px; height: 100px;">
-              <img src="../logo.png" alt="Logo" class="w-100 h-100 object-fit-contain">
+              <img src="../assets/img/logo.png" alt="Logo" class="w-100 h-100 object-fit-contain">
             </div>
             <div class="text-center text-sm-right">
               <h3 class="fw-black text-dark mb-1">الملف الشخصي</h3>

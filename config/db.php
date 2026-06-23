@@ -26,7 +26,7 @@ try {
             ]);
 
             // Read the schema.sql file
-            $schemaPath = __DIR__ . '/schema.sql';
+            $schemaPath = dirname(__DIR__) . '/schema.sql';
             if (file_exists($schemaPath)) {
                 $sql = file_get_contents($schemaPath);
                 

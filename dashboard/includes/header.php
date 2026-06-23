@@ -7,7 +7,7 @@
           <div
             class="border rounded-3 shadow-sm overflow-hidden d-flex align-items-center justify-content-center bg-white"
             style="width: 55px; height: 55px;">
-            <img src="../logo.png" alt="Logo" class="w-100 h-100 object-fit-contain p-1">
+            <img src="../assets/img/logo.png" alt="Logo" class="w-100 h-100 object-fit-contain p-1">
           </div>
           <div>
             <h1 class="fs-5 fw-black text-dark mb-0 leading-tight">منظمة محامي البليدة</h1>

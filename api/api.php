@@ -7,7 +7,7 @@ session_start();
 // resolve correctly from the point of view of the parent folder.
 chdir(dirname(__DIR__));
 
-require_once dirname(__DIR__) . '/db.php';
+require_once dirname(__DIR__) . '/config/db.php';
 
 // Helper function to generate UUID v4
 function generateUUID()

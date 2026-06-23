@@ -193,7 +193,7 @@
         <!-- Footer Copyrights Info -->
         <div
           class="text-center py-5 print-hidden text-muted d-flex flex-col align-items-center justify-content-center gap-2">
-          <img src="../logo.png" alt="Logo" class="opacity-25 grayscale" style="width: 50px;">
+          <img src="../assets/img/logo.png" alt="Logo" class="opacity-25 grayscale" style="width: 50px;">
           <p class="mb-0 text-xs">يتم ترتيب القائمة تلقائياً حسب تاريخ أداء اليمين (الأقدمية)</p>
           <p class="mb-0 fw-bold text-xs">جميع الحقوق محفوظة لمنظمة محامي البليدة © 2026</p>
         </div>

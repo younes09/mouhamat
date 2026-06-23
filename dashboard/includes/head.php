@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لوحة التحكم | منظمة محامي البليدة</title>
-  <link rel="icon" type="image/x-icon" href="../logo.png">
+  <link rel="icon" type="image/x-icon" href="../assets/img/logo.png">
 
   <!-- SEO Meta Tags -->
   <meta name="description"
@@ -29,7 +29,7 @@
   <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/material_green.css">
 
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 
 <body>

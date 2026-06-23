@@ -11,7 +11,7 @@ if (isset($_SESSION['user'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>دخول | منظمة محامي البليدة</title>
-  <link rel="icon" type="image/x-icon" href="logo.png">
+  <link rel="icon" type="image/x-icon" href="assets/img/logo.png">
   
   <!-- SEO Meta Tags -->
   <meta name="description" content="نظام إدارة الجلسات الرقمي لمنظمة محامي البليدة. تسجيل استخراج قوائم التسبيقات والتأجيلات وتسهيل التنسيق القضائي.">
@@ -29,7 +29,7 @@ if (isset($_SESSION['user'])) {
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
   
   <!-- Custom Styles -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
@@ -39,7 +39,7 @@ if (isset($_SESSION['user'])) {
       
       <div class="text-center mb-4">
         <div class="mx-auto mb-3 border rounded-4 shadow-sm overflow-hidden d-flex align-items-center justify-content-center bg-white" style="width: 120px; height: 120px;">
-          <img src="logo.png" alt="Logo" class="w-100 h-100 object-fit-contain p-2">
+          <img src="assets/img/logo.png" alt="Logo" class="w-100 h-100 object-fit-contain p-2">
         </div>
         <h2 class="fw-black text-dark mb-1">منظمة محامي البليدة</h2>
         <p class="text-success fw-bold text-sm">نظام إدارة الجلسات الرقمي</p>
@@ -192,6 +192,6 @@ if (isset($_SESSION['user'])) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   
   <!-- Local logic controllers -->
-  <script src="auth.js"></script>
+  <script src="js/auth.js"></script>
 </body>
 </html>
