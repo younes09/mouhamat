@@ -5,7 +5,7 @@ async function checkAuth() {
         return;
     }
     try {
-        const res = await fetch('../api.php?action=auth_check');
+        const res = await fetch('../api/api.php?action=auth_check');
         const data = await res.json();
         if (data.authenticated) {
             currentUser = data.user;
@@ -22,7 +22,7 @@ async function checkAuth() {
 // Fetch all settings, lists, and active status
 async function fetchSettings() {
     try {
-        const res = await fetch(`../api.php?action=get_settings&t=${Date.now()}`);
+        const res = await fetch(`../api/api.php?action=get_settings&t=${Date.now()}`);
         systemSettings = await res.json();
         
         // Synchronize selected council and names
@@ -41,7 +41,7 @@ async function fetchSettings() {
 // Fetch Active Requests or Archives
 async function fetchRequests(isHistory = false) {
     try {
-        const res = await fetch(`../api.php?action=get_requests&history=${isHistory}&t=${Date.now()}`);
+        const res = await fetch(`../api/api.php?action=get_requests&history=${isHistory}&t=${Date.now()}`);
         const data = await res.json();
         if (isHistory) {
             archiveRequests = data;
@@ -57,7 +57,7 @@ async function fetchRequests(isHistory = false) {
 // Fetch Announcements
 async function fetchAnnouncements() {
     try {
-        const res = await fetch(`../api.php?action=get_announcements&t=${Date.now()}`);
+        const res = await fetch(`../api/api.php?action=get_announcements&t=${Date.now()}`);
         announcements = await res.json();
         renderAnnouncements();
         updateNotificationBadge();
@@ -70,7 +70,7 @@ async function fetchAnnouncements() {
 async function fetchUsers() {
     if (currentUser.role !== 'admin') return;
     try {
-        const res = await fetch(`../api.php?action=get_users&t=${Date.now()}`);
+        const res = await fetch(`../api/api.php?action=get_users&t=${Date.now()}`);
         allUsers = await res.json();
         renderUsersList();
     } catch (e) {
@@ -81,7 +81,7 @@ async function fetchUsers() {
 // User Approvals actions
 async function updateUserStatus(id, status) {
     try {
-        const res = await fetch('../api.php?action=update_user_status', {
+        const res = await fetch('../api/api.php?action=update_user_status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, status })
@@ -101,7 +101,7 @@ async function updateUserStatus(id, status) {
 // Settings changes handlers
 async function updateAdminListStatus(isOpen) {
     try {
-        const res = await fetch('../api.php?action=update_list_status', {
+        const res = await fetch('../api/api.php?action=update_list_status', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ isOpen })
@@ -122,21 +122,21 @@ async function addAdminSettingItem(type) {
 
     if (type === 'council') {
         inputEl = document.getElementById('newCouncilInput');
-        url = '../api.php?action=add_council';
+        url = '../api/api.php?action=add_council';
         payload.name = inputEl.value;
     } else if (type === 'court') {
         inputEl = document.getElementById('newCourtInput');
         const councilSelect = document.getElementById('newCourtCouncilSelect');
-        url = '../api.php?action=add_court';
+        url = '../api/api.php?action=add_court';
         payload.name = inputEl.value;
         payload.council = councilSelect.value;
     } else if (type === 'section') {
         inputEl = document.getElementById('newSectionInput');
-        url = '../api.php?action=add_section';
+        url = '../api/api.php?action=add_section';
         payload.name = inputEl.value;
     } else if (type === 'chamber') {
         inputEl = document.getElementById('newChamberInput');
-        url = '../api.php?action=add_chamber';
+        url = '../api/api.php?action=add_chamber';
         payload.name = inputEl.value;
     }
 
@@ -166,10 +166,10 @@ async function addAdminSettingItem(type) {
 
 async function deleteAdminSettingItem(type, name) {
     let url;
-    if (type === 'council') url = '../api.php?action=delete_council';
-    else if (type === 'court') url = '../api.php?action=delete_court';
-    else if (type === 'section') url = '../api.php?action=delete_section';
-    else if (type === 'chamber') url = '../api.php?action=delete_chamber';
+    if (type === 'council') url = '../api/api.php?action=delete_council';
+    else if (type === 'court') url = '../api/api.php?action=delete_court';
+    else if (type === 'section') url = '../api/api.php?action=delete_section';
+    else if (type === 'chamber') url = '../api/api.php?action=delete_chamber';
 
     showConfirm(`هل أنت متأكد من حذف ${name}؟`, async () => {
         try {
@@ -195,7 +195,7 @@ async function postAnnouncement() {
     if (!text.trim()) return;
 
     try {
-        const res = await fetch('../api.php?action=add_announcement', {
+        const res = await fetch('../api/api.php?action=add_announcement', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text })
@@ -220,7 +220,7 @@ async function postAnnouncement() {
 
 async function toggleAnnouncementStatus(id, isActive) {
     try {
-        const res = await fetch('../api.php?action=toggle_announcement', {
+        const res = await fetch('../api/api.php?action=toggle_announcement', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, isActive })
@@ -238,7 +238,7 @@ async function toggleAnnouncementStatus(id, isActive) {
 async function deleteAnnouncement(id) {
     showConfirm('هل أنت متأكد من حذف هذا الإعلان؟', async () => {
         try {
-            const res = await fetch(`../api.php?action=delete_announcement&id=${id}`);
+            const res = await fetch(`../api/api.php?action=delete_announcement&id=${id}`);
             if (res.ok) {
                 showToast('تم حذف الإعلان بنجاح', 'success');
                 await fetchAnnouncements();
@@ -254,7 +254,7 @@ async function deleteAnnouncement(id) {
 function archiveCurrentList() {
     showConfirm('هل تريد نقل القائمة الحالية إلى الأرشيف؟', async () => {
         try {
-            const res = await fetch('../api.php?action=archive_requests');
+            const res = await fetch('../api/api.php?action=archive_requests');
             if (res.ok) {
                 showToast('تمت أرشفة القائمة بنجاح', 'success');
                 await fetchRequests(false);
@@ -269,7 +269,7 @@ function archiveCurrentList() {
 function clearCurrentList() {
     showConfirm('هل أنت متأكد من مسح القائمة بالكامل؟', async () => {
         try {
-            const res = await fetch('../api.php?action=clear_requests');
+            const res = await fetch('../api/api.php?action=clear_requests');
             if (res.ok) {
                 showToast('تم مسح القائمة بنجاح', 'success');
                 await fetchRequests(false);
@@ -294,7 +294,7 @@ async function saveAdminConstraints(event) {
     }
 
     try {
-        const res = await fetch('../api.php?action=update_constraints', {
+        const res = await fetch('../api/api.php?action=update_constraints', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ startTime, endTime, restrictedDays })

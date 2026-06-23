@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             errDiv.classList.add('d-none');
 
             try {
-                const res = await fetch('api.php?action=login', {
+                const res = await fetch('api/api.php?action=login', {
                     method: 'POST',
                     body: formData
                 });
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             errDiv.classList.add('d-none');
 
             try {
-                const res = await fetch('api.php?action=register', {
+                const res = await fetch('api/api.php?action=register', {
                     method: 'POST',
                     body: formData
                 });
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         guestLoginBtn.addEventListener('click', async () => {
             // Set session for guest
             try {
-                const res = await fetch('api.php?action=login', {
+                const res = await fetch('api/api.php?action=login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

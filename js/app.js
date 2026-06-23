@@ -215,7 +215,7 @@ function initEventListeners() {
             errDiv.classList.add('d-none');
 
             try {
-                const res = await fetch('../api.php?action=login', {
+                const res = await fetch('../api/api.php?action=login', {
                     method: 'POST',
                     body: formData
                 });
@@ -245,7 +245,7 @@ function initEventListeners() {
             errDiv.classList.add('d-none');
 
             try {
-                const res = await fetch('../api.php?action=register', {
+                const res = await fetch('../api/api.php?action=register', {
                     method: 'POST',
                     body: formData
                 });
@@ -390,7 +390,7 @@ function initEventListeners() {
                 payload.colleagueOathDate = document.getElementById('colleagueOathDate').value;
             }
 
-            const url = editingRequest ? '../api.php?action=edit_request' : '../api.php?action=add_request';
+            const url = editingRequest ? '../api/api.php?action=edit_request' : '../api/api.php?action=add_request';
             if (editingRequest) {
                 payload.id = editingRequest.id;
             }
@@ -444,7 +444,7 @@ function initEventListeners() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async () => {
-            await fetch('../api.php?action=logout');
+            await fetch('../api/api.php?action=logout');
             currentUser = null;
             window.location.href = '../index.php';
         });

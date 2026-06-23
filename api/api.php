@@ -3,7 +3,11 @@ date_default_timezone_set('Africa/Algiers');
 header('Content-Type: application/json');
 session_start();
 
-require_once __DIR__ . '/db.php';
+// Change working directory to project root so that all relative paths (like 'uploads/')
+// resolve correctly from the point of view of the parent folder.
+chdir(dirname(__DIR__));
+
+require_once dirname(__DIR__) . '/db.php';
 
 // Helper function to generate UUID v4
 function generateUUID()
@@ -56,7 +60,7 @@ switch ($action) {
     case 'login':
     case 'register':
     case 'logout':
-        require_once __DIR__ . '/api/auth.php';
+        require_once __DIR__ . '/auth.php';
         break;
 
     case 'get_requests':
@@ -65,7 +69,7 @@ switch ($action) {
     case 'delete_request':
     case 'archive_requests':
     case 'clear_requests':
-        require_once __DIR__ . '/api/requests.php';
+        require_once __DIR__ . '/requests.php';
         break;
 
     case 'get_settings':
@@ -79,14 +83,14 @@ switch ($action) {
     case 'delete_section':
     case 'add_chamber':
     case 'delete_chamber':
-        require_once __DIR__ . '/api/settings.php';
+        require_once __DIR__ . '/settings.php';
         break;
 
     case 'get_announcements':
     case 'add_announcement':
     case 'toggle_announcement':
     case 'delete_announcement':
-        require_once __DIR__ . '/api/announcements.php';
+        require_once __DIR__ . '/announcements.php';
         break;
 
     case 'get_users':
@@ -94,7 +98,7 @@ switch ($action) {
     case 'add_user':
     case 'edit_user':
     case 'delete_user':
-        require_once __DIR__ . '/api/users.php';
+        require_once __DIR__ . '/users.php';
         break;
 
     default:

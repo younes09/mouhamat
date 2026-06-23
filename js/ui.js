@@ -632,7 +632,7 @@ function deleteRequestPrompt(id, isHistory = false) {
     const msg = isHistory ? 'هل تريد حذف هذا السجل نهائياً من الأرشيف؟' : 'هل أنت متأكد من الحذف؟';
     showConfirm(msg, async () => {
         try {
-            const res = await fetch(`../api.php?action=delete_request&id=${id}`);
+            const res = await fetch(`../api/api.php?action=delete_request&id=${id}`);
             const data = await res.json();
             if (res.ok) {
                 showToast('تم الحذف بنجاح', 'success');
@@ -774,7 +774,7 @@ function openUserModal(userObj = null) {
         const isEditing = !!editingUser;
         if (isEditing) payload.id = editingUser.id;
 
-        const url = isEditing ? '../api.php?action=edit_user' : '../api.php?action=add_user';
+        const url = isEditing ? '../api/api.php?action=edit_user' : '../api/api.php?action=add_user';
 
         try {
             const res = await fetch(url, {
@@ -816,7 +816,7 @@ function editUserPrompt(id) {
 function deleteUserPrompt(id, name) {
     showConfirm(`هل أنت متأكد من حذف حساب الأستاذ ${name} نهائياً؟`, async () => {
         try {
-            const res = await fetch('../api.php?action=delete_user', {
+            const res = await fetch('../api/api.php?action=delete_user', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id })
