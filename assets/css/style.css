@@ -302,6 +302,18 @@ body {
   background-color: #1e293b !important;
 }
 
+.dark .card {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+}
+
+.dark .card-header,
+.dark .card-footer {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  border-color: var(--border-color) !important;
+}
+
 /* Form Controls & Inputs */
 .dark .form-control,
 .dark .form-select {
@@ -415,6 +427,30 @@ body {
 
 .dark .text-danger-emphasis {
   color: #fca5a5 !important;
+}
+
+/* Tables */
+.dark .table {
+  --bs-table-bg: transparent !important;
+  --bs-table-color: var(--text-main) !important;
+  --bs-table-border-color: var(--border-color) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-color) !important;
+}
+
+.dark .table th {
+  background-color: var(--bg-main) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-color) !important;
+}
+
+.dark .table td {
+  color: var(--text-main) !important;
+  border-color: var(--border-color) !important;
+}
+
+.dark .table tr:not([class*="bg-"]):not([class*="alert-"]) td {
+  background-color: var(--bg-card) !important;
 }
 
 /* Buttons */
