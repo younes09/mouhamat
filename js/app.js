@@ -41,14 +41,36 @@ async function initApp() {
     }
     
     // Init flatpickr calendar
-    flatpickr("#calendarPicker", {
+    calendarInstance = flatpickr("#calendarPicker", {
         inline: true,
         locale: "ar",
         defaultDate: selectedDate,
         onChange: (selectedDates, dateStr) => {
-            selectedDate = dateStr;
+            if (selectedDates.length > 0) {
+                const d = selectedDates[0];
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                selectedDate = `${y}-${m}-${day}`;
+            }
             renderRequestsTable();
-            showTab('requests');
+            renderCalendarRequests();
+        },
+        onDayCreate: (dObj, dStr, fp, dayElem) => {
+            const y = dayElem.dateObj.getFullYear();
+            const m = String(dayElem.dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dayElem.dateObj.getDate()).padStart(2, '0');
+            const dateStr = `${y}-${m}-${d}`;
+            
+            const count = requests.filter(r => r.sessionDate === dateStr).length;
+            if (count > 0) {
+                if (!dayElem.querySelector('.flatpickr-day-badge')) {
+                    const badge = document.createElement('span');
+                    badge.className = 'flatpickr-day-badge';
+                    badge.innerText = count;
+                    dayElem.appendChild(badge);
+                }
+            }
         }
     });
 

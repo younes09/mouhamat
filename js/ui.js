@@ -26,6 +26,11 @@ function showTab(tabId) {
         renderRequestsTable(); // will render from archive requests if tab is archive
     } else if (tabId === 'calendar') {
         document.getElementById('calendarView').classList.remove('d-none');
+        renderCalendarRequests();
+        if (window.calendarInstance || calendarInstance) {
+            const fp = window.calendarInstance || calendarInstance;
+            fp.redraw();
+        }
     } else if (tabId === 'stats') {
         document.getElementById('statsView').classList.remove('d-none');
         renderStats();
@@ -277,6 +282,16 @@ function renderRequestsTable() {
     });
 
     if (window.lucide) lucide.createIcons();
+
+    // Redraw calendar and update sidebar if calendarInstance is initialized
+    if (window.calendarInstance || calendarInstance) {
+        const fp = window.calendarInstance || calendarInstance;
+        fp.redraw();
+    }
+    const calContainer = document.getElementById('calendarRequestsContainer');
+    if (calContainer && !document.getElementById('calendarView').classList.contains('d-none')) {
+        renderCalendarRequests();
+    }
 }
 
 // Notice Board Display
@@ -859,4 +874,164 @@ function openPrintPage() {
     });
     window.open(`../print.php?${params.toString()}`, '_blank');
 }
+
+// Redesigned Judicial Calendar Logic
+function renderCalendarRequests() {
+    const container = document.getElementById('calendarRequestsContainer');
+    if (!container) return;
+    
+    // Set Long/Short Date Labels
+    const dateObj = new Date(selectedDate);
+    const longDateStr = dateObj.toLocaleDateString('ar-DZ', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    document.getElementById('calendarSelectedDateLong').innerText = longDateStr;
+    
+    // Relative status (Today, Tomorrow, Past, Upcoming)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const targetDate = new Date(selectedDate);
+    targetDate.setHours(0, 0, 0, 0);
+    
+    const diffTime = targetDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    let relativeStr = '';
+    if (diffDays === 0) {
+        relativeStr = 'جلسة اليوم';
+    } else if (diffDays === 1) {
+        relativeStr = 'جلسة الغد';
+    } else if (diffDays === -1) {
+        relativeStr = 'جلسة الأمس';
+    } else if (diffDays > 1) {
+        relativeStr = `جلسة مقبلة (بعد ${diffDays} يوم)`;
+    } else {
+        relativeStr = `جلسة سابقة (منذ ${Math.abs(diffDays)} يوم)`;
+    }
+    document.getElementById('calendarSelectedDateShort').innerText = relativeStr;
+
+    // Filter requests for selected date
+    const dailyRequests = requests.filter(r => r.sessionDate === selectedDate);
+    
+    // Stats calculation
+    const totalCount = dailyRequests.length;
+    const delayCount = dailyRequests.filter(r => r.purpose === 'delay').length;
+    const advanceCount = dailyRequests.filter(r => r.purpose === 'advance').length;
+
+    const statsPanel = document.getElementById('calendarDayStats');
+    statsPanel.innerHTML = `
+        <span class="badge bg-success-subtle text-success-emphasis border border-success border-opacity-25 rounded-pill px-2.5 py-1.5 text-xs d-flex align-items-center gap-1">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+            <span>${totalCount}</span> إجمالي
+        </span>
+        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning border-opacity-25 rounded-pill px-2.5 py-1.5 text-xs d-flex align-items-center gap-1">
+            <span class="rounded-circle bg-warning d-inline-block" style="width: 6px; height: 6px;"></span>
+            <span>${delayCount}</span> تأجيل
+        </span>
+        <span class="badge bg-primary-subtle text-primary-emphasis border border-primary border-opacity-25 rounded-pill px-2.5 py-1.5 text-xs d-flex align-items-center gap-1">
+            <span class="rounded-circle bg-primary d-inline-block" style="width: 6px; height: 6px;"></span>
+            <span>${advanceCount}</span> تسبيق
+        </span>
+    `;
+
+    // Toggle add button depending on whether the list is open and not guest
+    const addBtn = document.getElementById('calendarAddNewCaseBtn');
+    if (addBtn) {
+        const canAdd = currentUser && currentUser.role !== 'guest' && systemSettings.isListOpen;
+        if (canAdd) {
+            addBtn.classList.remove('d-none');
+        } else {
+            addBtn.classList.add('d-none');
+        }
+    }
+
+    container.innerHTML = '';
+    
+    if (dailyRequests.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5 my-auto text-muted">
+                <i data-lucide="calendar-range" class="w-12 h-12 opacity-25 d-block mx-auto mb-2" style="margin-top: 2rem;"></i>
+                <p class="text-sm mb-1 fw-bold">لا توجد طلبات مسجلة في هذا التاريخ</p>
+                <p class="text-xs text-muted">اضغط على زر "إضافة قضية جديدة" لتسجيل طلب في هذه الجلسة.</p>
+            </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+    }
+    
+    // Sort delay first, then seniority, then created date
+    const sortedDaily = [...dailyRequests].sort((a, b) => {
+        if (a.purpose !== b.purpose) {
+            return a.purpose === 'delay' ? -1 : 1;
+        }
+        const getSeniorityScore = (req) => {
+            if (req.isSyndicateMember || req.oathDate === 'عضو نقابة') return 0;
+            const year = parseInt(req.oathDate);
+            return isNaN(year) ? 9999 : year;
+        };
+        const scoreA = getSeniorityScore(a);
+        const scoreB = getSeniorityScore(b);
+        if (scoreA !== scoreB) return scoreA - scoreB;
+        return a.createdAt - b.createdAt;
+    });
+
+    sortedDaily.forEach((req, idx) => {
+        const badgeClass = req.purpose === 'delay' ? 'bg-warning text-dark' : 'bg-primary text-white';
+        const purposeText = req.purpose === 'delay' ? 'تأجيل' : 'تسبيق';
+        const purposeClass = req.purpose === 'delay' ? 'purpose-delay' : 'purpose-advance';
+        
+        let actionButtons = '';
+        if (currentUser && currentUser.role !== 'guest') {
+            const canModify = (currentUser.role === 'admin' || currentUser.role === 'delegate' || req.creatorId === currentUser.id);
+            if (canModify) {
+                actionButtons = `
+                    <div class="d-flex gap-1">
+                        <button onclick="editRequestPrompt('${req.id}')" class="btn btn-xs btn-outline-success border-0 p-1" title="تعديل">
+                            <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button onclick="deleteRequestPrompt('${req.id}')" class="btn btn-xs btn-outline-danger border-0 p-1" title="حذف">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        const div = document.createElement('div');
+        div.className = `calendar-request-item p-3 mb-2 rounded bg-light border ${purposeClass} d-flex justify-content-between align-items-start gap-2`;
+        div.innerHTML = `
+            <div class="d-flex flex-column flex-grow-1 gap-1 text-start">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge ${badgeClass} text-xs">${purposeText}</span>
+                    <h6 class="fw-bold text-sm text-dark mb-0">${req.lawyerName}</h6>
+                </div>
+                <div class="text-xs text-muted">
+                    <span class="fw-medium text-dark font-monospace">${req.caseNumber}</span>
+                    <span class="mx-1">•</span>
+                    <span>الأطراف: ${req.parties}</span>
+                </div>
+                <div class="text-xxs text-success fw-bold d-flex align-items-center gap-1">
+                    <i data-lucide="map-pin" class="w-3 h-3"></i>
+                    <span>${req.jurisdiction.name} - ${req.jurisdiction.subEntity}</span>
+                </div>
+            </div>
+            ${actionButtons}
+        `;
+        container.appendChild(div);
+    });
+    
+    if (window.lucide) lucide.createIcons();
+}
+
+function goToSelectedDateRequests() {
+    showTab('requests');
+}
+
+function openAddCaseModalFromCalendar() {
+    openAddCaseModal(null);
+}
+
 

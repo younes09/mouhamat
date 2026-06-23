@@ -46,6 +46,7 @@ let isAddingRequest = false;
 let isForColleague = false;
 let editingRequest = null;
 let viewingCardUrl = null;
+let calendarInstance = null;
 let isDarkMode = localStorage.getItem('darkMode') === 'true';
 let showNotes = localStorage.getItem('showNotes') !== 'false';
 let notificationsEnabled = localStorage.getItem('notificationsEnabled') === 'true';
