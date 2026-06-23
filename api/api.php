@@ -59,6 +59,7 @@ switch ($action) {
     case 'auth_check':
     case 'login':
     case 'register':
+    case 'update_profile':
     case 'logout':
         require_once __DIR__ . '/auth.php';
         break;

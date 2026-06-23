@@ -159,6 +159,40 @@ function initEventListeners() {
         });
     }
 
+    // User management search & filters binding
+    const userSearchEl = document.getElementById('userSearchInput');
+    if (userSearchEl) {
+        userSearchEl.addEventListener('input', (e) => {
+            userSearchQuery = e.target.value;
+            renderUsersList();
+        });
+    }
+
+    const userRoleEl = document.getElementById('userRoleFilter');
+    if (userRoleEl) {
+        userRoleEl.addEventListener('change', (e) => {
+            userRoleFilter = e.target.value;
+            renderUsersList();
+        });
+    }
+
+    const userStatusEl = document.getElementById('userStatusFilter');
+    if (userStatusEl) {
+        userStatusEl.addEventListener('change', (e) => {
+            userStatusFilter = e.target.value;
+            renderUsersList();
+        });
+    }
+
+    // Announcement search binding
+    const annSearchEl = document.getElementById('announcementSearchInput');
+    if (annSearchEl) {
+        annSearchEl.addEventListener('input', (e) => {
+            announcementSearchQuery = e.target.value;
+            renderAnnouncementsDetails();
+        });
+    }
+
     // Jurisdiction Select handlers
     const jurTypeSelect = document.getElementById('jurTypeSelect');
     if (jurTypeSelect) {
@@ -567,3 +601,150 @@ function initPwaInstall() {
         if (iframeMsg) iframeMsg.classList.remove('d-none');
     }
 }
+
+// ==================== PROFILE EDITING ====================
+
+function showProfileAlert(containerId, msgId, type, message) {
+    const box = document.getElementById(containerId);
+    const msg = document.getElementById(msgId);
+    if (!box || !msg) return;
+    box.className = `alert alert-${type} alert-dismissible rounded-3 mb-3 text-sm fw-semibold`;
+    msg.innerText = message;
+    box.classList.remove('d-none');
+    setTimeout(() => box.classList.add('d-none'), 5000);
+}
+
+async function saveProfileInfo(event) {
+    event.preventDefault();
+    const btn = document.getElementById('profileSaveBtn');
+    const origHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> جاري الحفظ...';
+
+    try {
+        const payload = {
+            action:    'update_profile',
+            lastName:  document.getElementById('profileLastName').value.trim(),
+            firstName: document.getElementById('profileFirstName').value.trim(),
+            email:     document.getElementById('profileEmail').value.trim(),
+            phone:     document.getElementById('profilePhone').value.trim(),
+        };
+        const res  = await fetch('../api/api.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (data.success) {
+            currentUser = data.user;
+            updateHeaderUserProfile();
+            renderProfile();
+            showProfileAlert('profileInfoAlert', 'profileInfoAlertMsg', 'success', '✓ تم حفظ المعلومات بنجاح');
+        } else {
+            showProfileAlert('profileInfoAlert', 'profileInfoAlertMsg', 'danger', data.error || 'حدث خطأ');
+        }
+    } catch (e) {
+        showProfileAlert('profileInfoAlert', 'profileInfoAlertMsg', 'danger', 'تعذر الاتصال بالخادم');
+    } finally {
+        btn.disabled  = false;
+        btn.innerHTML = origHTML;
+        lucide.createIcons();
+    }
+}
+
+async function saveNewPassword(event) {
+    event.preventDefault();
+    const current  = document.getElementById('currentPassword').value;
+    const newPwd   = document.getElementById('newPassword').value;
+    const confirm  = document.getElementById('confirmPassword').value;
+
+    if (!current || !newPwd) {
+        return showProfileAlert('profilePasswordAlert', 'profilePasswordAlertMsg', 'warning', 'يرجى ملء جميع حقول كلمة السر');
+    }
+    if (newPwd !== confirm) {
+        return showProfileAlert('profilePasswordAlert', 'profilePasswordAlertMsg', 'warning', 'كلمة السر الجديدة وتأكيدها غير متطابقتين');
+    }
+
+    const btn = document.getElementById('passwordSaveBtn');
+    const origHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> جاري التحديث...';
+
+    try {
+        const payload = {
+            action:          'update_profile',
+            lastName:        currentUser.last_name,
+            firstName:       currentUser.first_name,
+            email:           currentUser.email  || '',
+            phone:           currentUser.phone  || '',
+            currentPassword: current,
+            newPassword:     newPwd,
+        };
+        const res  = await fetch('../api/api.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const data = await res.json();
+        if (data.success) {
+            showProfileAlert('profilePasswordAlert', 'profilePasswordAlertMsg', 'success', '✓ تم تحديث كلمة السر بنجاح');
+            document.getElementById('profilePasswordForm').reset();
+            document.getElementById('pwdStrengthBar').classList.add('d-none');
+        } else {
+            showProfileAlert('profilePasswordAlert', 'profilePasswordAlertMsg', 'danger', data.error || 'حدث خطأ');
+        }
+    } catch (e) {
+        showProfileAlert('profilePasswordAlert', 'profilePasswordAlertMsg', 'danger', 'تعذر الاتصال بالخادم');
+    } finally {
+        btn.disabled  = false;
+        btn.innerHTML = origHTML;
+        lucide.createIcons();
+    }
+}
+
+function togglePasswordSection() {
+    const section = document.getElementById('passwordSection');
+    const icon    = document.getElementById('passwordToggleIcon');
+    if (!section) return;
+    section.classList.toggle('d-none');
+    if (icon) {
+        icon.setAttribute('data-lucide', section.classList.contains('d-none') ? 'chevron-down' : 'chevron-up');
+        lucide.createIcons();
+    }
+}
+
+function togglePwdVisibility(fieldId, btn) {
+    const field = document.getElementById(fieldId);
+    if (!field) return;
+    const isText = field.type === 'text';
+    field.type = isText ? 'password' : 'text';
+    const icon = btn.querySelector('i');
+    if (icon) {
+        icon.setAttribute('data-lucide', isText ? 'eye' : 'eye-off');
+        lucide.createIcons();
+    }
+}
+
+// Password strength meter — wire up after DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    const pwdInput = document.getElementById('newPassword');
+    if (!pwdInput) return;
+    pwdInput.addEventListener('input', () => {
+        const val   = pwdInput.value;
+        const bar   = document.getElementById('pwdStrengthBar');
+        const fill  = document.getElementById('pwdStrengthFill');
+        const label = document.getElementById('pwdStrengthLabel');
+        if (!val) { bar.classList.add('d-none'); return; }
+        bar.classList.remove('d-none');
+        let score = 0;
+        if (val.length >= 6)           score++;
+        if (val.length >= 10)          score++;
+        if (/[A-Z]/.test(val))         score++;
+        if (/[0-9]/.test(val))         score++;
+        if (/[^A-Za-z0-9]/.test(val))  score++;
+        const levels = [
+            { pct: 20,  cls: 'bg-danger',  txt: 'ضعيفة جداً' },
+            { pct: 40,  cls: 'bg-danger',  txt: 'ضعيفة' },
+            { pct: 60,  cls: 'bg-warning', txt: 'متوسطة' },
+            { pct: 80,  cls: 'bg-info',    txt: 'جيدة' },
+            { pct: 100, cls: 'bg-success', txt: 'قوية جداً' },
+        ];
+        const lvl = levels[Math.min(score, 4)];
+        fill.style.width = lvl.pct + '%';
+        fill.className   = `progress-bar rounded-pill transition-all ${lvl.cls}`;
+        label.innerText  = `قوة كلمة السر: ${lvl.txt}`;
+        label.className  = `text-xs mt-1 mb-0 ${lvl.cls.replace('bg-', 'text-')}`;
+    });
+});

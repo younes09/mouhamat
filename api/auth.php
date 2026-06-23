@@ -142,6 +142,62 @@ switch ($action) {
         sendResponse(['pending' => true, 'message' => 'تم تسجيل طلبك بنجاح. سيتم مراجعة بطاقة المحامي من طرف المندوب قبل تفعيل الحساب.']);
         break;
 
+    case 'update_profile':
+        if (!isset($_SESSION['user']) || $_SESSION['user']['id'] === 'guest') {
+            sendResponse(['error' => 'غير مصرح'], 403);
+        }
+        $userId = $_SESSION['user']['id'];
+        $lastName  = trim($input['lastName']  ?? '');
+        $firstName = trim($input['firstName'] ?? '');
+        $email     = trim(strtolower($input['email'] ?? ''));
+        $phone     = trim($input['phone'] ?? '');
+
+        if (empty($lastName) || empty($firstName)) {
+            sendResponse(['error' => 'الاسم واللقب حقلان مطلوبان'], 400);
+        }
+
+        // Email uniqueness check (exclude self)
+        if (!empty($email)) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                sendResponse(['error' => 'البريد الإلكتروني غير صالح'], 400);
+            }
+            $emailTaken = dbFetch("SELECT id FROM users WHERE email = ? AND id != ?", [$email, $userId]);
+            if ($emailTaken) {
+                sendResponse(['error' => 'هذا البريد الإلكتروني مستخدم من حساب آخر'], 400);
+            }
+        }
+
+        // Password change (optional)
+        $currentPassword = $input['currentPassword'] ?? '';
+        $newPassword     = $input['newPassword']     ?? '';
+        if (!empty($newPassword)) {
+            if (strlen($newPassword) < 6) {
+                sendResponse(['error' => 'كلمة السر الجديدة يجب أن تكون 6 أحرف على الأقل'], 400);
+            }
+            $dbUser = dbFetch("SELECT password FROM users WHERE id = ?", [$userId]);
+            if (!$dbUser || !password_verify($currentPassword, $dbUser['password'])) {
+                sendResponse(['error' => 'كلمة السر الحالية غير صحيحة'], 400);
+            }
+            $hashedNew = password_hash($newPassword, PASSWORD_BCRYPT);
+            dbQuery(
+                "UPDATE users SET first_name=?, last_name=?, email=?, phone=?, password=? WHERE id=?",
+                [$firstName, $lastName, $email ?: null, $phone ?: null, $hashedNew, $userId]
+            );
+        } else {
+            dbQuery(
+                "UPDATE users SET first_name=?, last_name=?, email=?, phone=? WHERE id=?",
+                [$firstName, $lastName, $email ?: null, $phone ?: null, $userId]
+            );
+        }
+
+        // Refresh session with updated data
+        $updatedUser = dbFetch("SELECT id, first_name, last_name, email, phone, oath_date, is_syndicate_member, role, status FROM users WHERE id=?", [$userId]);
+        if ($updatedUser) {
+            $_SESSION['user'] = $updatedUser;
+        }
+        sendResponse(['success' => true, 'user' => $updatedUser]);
+        break;
+
     case 'logout':
         session_destroy();
         sendResponse(['success' => true]);

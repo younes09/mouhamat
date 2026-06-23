@@ -311,7 +311,7 @@ function renderAnnouncements() {
     
     activeList.slice(0, 2).forEach(a => {
         const item = document.createElement('div');
-        item.className = 'p-3 mb-2 rounded bg-light border-start border-success border-3';
+        item.className = 'p-3 mb-2 rounded bg-light-custom border-start border-success border-3';
         item.innerHTML = `
             <div class="d-flex gap-2">
                 <i data-lucide="alert-circle" class="w-4 h-4 text-success mt-0.5"></i>
@@ -327,15 +327,29 @@ function renderAnnouncements() {
 // Renders the dedicated Announcements view
 function renderAnnouncementsDetails() {
     const container = document.getElementById('announcementsFullGrid');
+    if (!container) return;
     container.innerHTML = '';
 
-    const activeList = announcements.filter(a => a.isActive);
+    // Filter active announcements
+    let activeList = announcements.filter(a => a.isActive);
+
+    // Update active count badge
+    const countBadge = document.getElementById('activeAnnouncementsCount');
+    if (countBadge) {
+        countBadge.innerText = activeList.length;
+    }
+
+    // Apply search filter
+    if (announcementSearchQuery.trim() !== '') {
+        const query = announcementSearchQuery.toLowerCase().trim();
+        activeList = activeList.filter(a => a.text.toLowerCase().includes(query));
+    }
 
     if (activeList.length === 0) {
         container.innerHTML = `
-            <div class="text-center py-5">
+            <div class="col-12 text-center py-5">
                 <i data-lucide="bell-off" class="w-16 h-16 text-muted opacity-25 d-block mx-auto mb-3"></i>
-                <p class="text-muted fw-bold">لا توجد إعلانات نشطة حالياً</p>
+                <p class="text-muted fw-bold">لا توجد إعلانات مطابقة لنتائج البحث</p>
             </div>
         `;
         if (window.lucide) lucide.createIcons();
@@ -343,29 +357,33 @@ function renderAnnouncementsDetails() {
     }
 
     activeList.forEach((a, idx) => {
-        const div = document.createElement('div');
-        div.className = 'p-4 mb-3 premium-card border-start border-success border-4';
-        div.innerHTML = `
-            <div class="d-flex align-items-start gap-3">
-                <div class="p-2 rounded bg-success-subtle text-success">
-                    <i data-lucide="alert-circle" class="w-6 h-6"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <p class="fs-5 fw-bold text-dark mb-3 leading-relaxed">${a.text}</p>
-                    <div class="d-flex justify-content-between align-items-center pt-2 border-top">
-                        <small class="text-muted">
-                            <i data-lucide="user" class="w-3.5 h-3.5 inline-block me-1"></i>
-                            بواسطة: ${a.authorName}
-                        </small>
-                        <small class="text-muted">
-                            <i data-lucide="calendar" class="w-3.5 h-3.5 inline-block me-1"></i>
-                            ${new Date(a.createdAt).toLocaleDateString('ar-DZ')}
-                        </small>
+        const col = document.createElement('div');
+        col.className = 'col-12 col-lg-6';
+        col.innerHTML = `
+            <div class="card premium-card p-4 border-start border-success border-4 h-100 shadow-xs hover-translate-y transition-all d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-2">
+                        <span class="badge bg-success-subtle text-success fw-bold text-xs d-flex align-items-center gap-1">
+                            <i data-lucide="bell" class="w-3.5 h-3.5"></i>
+                            إعلان رسمي #${idx + 1}
+                        </span>
+                        <span class="badge bg-light text-muted text-xs">نشط</span>
                     </div>
+                    <p class="fs-6 fw-bold text-dark mb-4 leading-relaxed" style="white-space: pre-line;">${a.text}</p>
+                </div>
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-auto text-xs text-muted">
+                    <span class="d-flex align-items-center gap-1">
+                        <i data-lucide="user" class="w-3.5 h-3.5 text-success"></i>
+                        بواسطة: ${a.authorName}
+                    </span>
+                    <span class="d-flex align-items-center gap-1">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 text-success"></i>
+                        تاريخ النشر: ${new Date(a.createdAt).toLocaleDateString('ar-DZ')}
+                    </span>
                 </div>
             </div>
         `;
-        container.appendChild(div);
+        container.appendChild(col);
     });
 
     if (window.lucide) lucide.createIcons();
@@ -380,16 +398,30 @@ function renderStats() {
 
 // Renders Profile Tab
 function renderProfile() {
-    document.getElementById('profileLastName').value = currentUser.last_name;
-    document.getElementById('profileFirstName').value = currentUser.first_name;
-    document.getElementById('profileOathDate').value = currentUser.oath_date || '—';
-    if (document.getElementById('profileEmail')) document.getElementById('profileEmail').value = currentUser.email || '—';
-    if (document.getElementById('profilePhone')) document.getElementById('profilePhone').value = currentUser.phone || '—';
-    
+    if (!currentUser) return;
+
+    // Role label
     let roleText = 'محامي';
-    if (currentUser.role === 'admin') roleText = 'مسؤول';
-    else if (currentUser.role === 'delegate') roleText = 'مندوب';
-    document.getElementById('profileRole').value = roleText;
+    if (currentUser.role === 'admin') roleText = 'مسؤول النظام';
+    else if (currentUser.role === 'delegate') roleText = 'مندوب النقيب';
+
+    // Header read-only area
+    const headerName = document.getElementById('profileHeaderName');
+    const roleBadge  = document.getElementById('profileRoleBadge');
+    const oathBadge  = document.getElementById('profileOathBadge');
+    if (headerName) headerName.innerText = `${currentUser.last_name} ${currentUser.first_name}`;
+    if (roleBadge)  roleBadge.innerText  = roleText;
+    if (oathBadge)  oathBadge.innerText  = currentUser.oath_date ? `اليمين: ${currentUser.oath_date}` : 'بدون تاريخ يمين';
+
+    // Editable info form
+    const ln = document.getElementById('profileLastName');
+    const fn = document.getElementById('profileFirstName');
+    const em = document.getElementById('profileEmail');
+    const ph = document.getElementById('profilePhone');
+    if (ln) ln.value = currentUser.last_name  || '';
+    if (fn) fn.value = currentUser.first_name || '';
+    if (em) em.value = currentUser.email || '';
+    if (ph) ph.value = currentUser.phone || '';
 }
 
 // Renders System Admin Settings
@@ -401,12 +433,12 @@ function renderSettings() {
         listState.innerText = 'حالة القائمة: مفتوحة';
         listState.className = 'fw-bold text-success';
         toggleBtn.innerText = 'غلق القائمة';
-        toggleBtn.className = 'btn btn-danger btn-sm fw-bold px-3';
+        toggleBtn.className = 'btn btn-danger btn-sm fw-bold px-4 py-2 rounded-3 scale-active';
     } else {
         listState.innerText = 'حالة القائمة: مغلقة';
         listState.className = 'fw-bold text-danger';
         toggleBtn.innerText = 'فتح القائمة';
-        toggleBtn.className = 'btn btn-success btn-sm fw-bold px-3';
+        toggleBtn.className = 'btn btn-success btn-sm fw-bold px-4 py-2 rounded-3 scale-active';
     }
 
     // Populate constraints values
@@ -425,6 +457,18 @@ function renderSettings() {
         }
     }
 
+    // Populate newCourtCouncilSelect dropdown
+    const newCourtCouncilSelect = document.getElementById('newCourtCouncilSelect');
+    if (newCourtCouncilSelect) {
+        newCourtCouncilSelect.innerHTML = '';
+        systemSettings.councils.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.innerText = c;
+            newCourtCouncilSelect.appendChild(opt);
+        });
+    }
+
     // Render list elements for lists configs
     renderAdminSettingList('councilsListContainer', systemSettings.councils, 'council');
     renderAdminSettingList('courtsListContainer', systemSettings.courts, 'court');
@@ -441,16 +485,19 @@ function renderAdminSettingList(elementId, itemsList, type) {
     container.innerHTML = '';
     
     if (itemsList.length === 0) {
-        container.innerHTML = '<p class="text-muted text-xs italic py-2">لا توجد عناصر مضافة</p>';
+        container.innerHTML = '<p class="text-muted text-xs italic py-3 text-center">لا توجد عناصر مضافة بعد</p>';
         return;
     }
 
     itemsList.forEach(item => {
         const div = document.createElement('div');
-        div.className = 'd-flex justify-content-between align-items-center p-2 mb-2 bg-light rounded border';
+        div.className = 'd-flex justify-content-between align-items-center p-2.5 mb-2 bg-light-custom rounded-3 border hover-translate-y shadow-xs transition-all';
         div.innerHTML = `
-            <span class="text-sm">${item}</span>
-            <button onclick="deleteAdminSettingItem('${type}', '${item}')" class="btn btn-sm text-danger p-1 border-0">
+            <div class="d-flex align-items-center gap-2">
+                <span class="rounded-circle bg-success" style="width: 6px; height: 6px;"></span>
+                <span class="text-sm fw-bold text-dark">${item}</span>
+            </div>
+            <button onclick="deleteAdminSettingItem('${type}', '${item}')" class="btn btn-sm btn-outline-danger border-0 p-1 rounded-2 scale-active" title="حذف">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
             </button>
         `;
@@ -472,20 +519,21 @@ function renderAdminAnnouncements() {
 
     announcements.forEach(a => {
         const div = document.createElement('div');
-        div.className = `p-3 mb-2 rounded border d-flex justify-content-between align-items-center ${a.isActive ? 'bg-success-subtle border-success' : 'bg-light border-secondary opacity-75'}`;
+        div.className = `p-4 mb-3 premium-card border d-flex justify-content-between align-items-center rounded-3 shadow-xs transition-all ${a.isActive ? 'border-success bg-success-subtle' : 'border-secondary bg-light-custom opacity-75'}`;
         div.innerHTML = `
             <div>
                 <p class="mb-1 fw-bold text-sm text-dark">${a.text}</p>
-                <small class="text-muted text-xs">
-                    ${new Date(a.createdAt).toLocaleString('ar-DZ')} • ${a.authorName}
+                <small class="text-muted text-xs d-flex align-items-center gap-1">
+                    <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                    ${new Date(a.createdAt).toLocaleString('ar-DZ')} • المندوب: ${a.authorName}
                 </small>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <button onclick="toggleAnnouncementStatus('${a.id}', ${!a.isActive})" class="btn btn-xs ${a.isActive ? 'btn-warning' : 'btn-success'} py-1 px-2 text-xs">
-                    ${a.isActive ? 'إيقاف' : 'تفعيل'}
+                <button onclick="toggleAnnouncementStatus('${a.id}', ${!a.isActive})" class="btn btn-xs fw-bold px-2.5 py-1 text-xs rounded-2 scale-active ${a.isActive ? 'btn-warning text-dark' : 'btn-success text-white'}">
+                    ${a.isActive ? 'إيقاف البث' : 'تفعيل البث'}
                 </button>
-                <button onclick="deleteAnnouncement('${a.id}')" class="btn btn-sm text-danger border-0 p-1">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <button onclick="deleteAnnouncement('${a.id}')" class="btn btn-sm btn-outline-danger border-0 p-1 rounded-2 scale-active" title="حذف">
+                    <i data-lucide="trash-2" class="w-4.5 h-4.5"></i>
                 </button>
             </div>
         `;
@@ -498,52 +546,144 @@ function renderAdminAnnouncements() {
 // Render Users List (Admin only)
 function renderUsersList() {
     const tbody = document.getElementById('usersTableBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
+    const mobileContainer = document.getElementById('usersMobileContainer');
+    
+    if (tbody) tbody.innerHTML = '';
+    if (mobileContainer) mobileContainer.innerHTML = '';
 
-    if (allUsers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-5 text-muted">لا يوجد مستخدمين مسجلين</td></tr>';
+    // Apply Search and Filters
+    const filteredUsers = allUsers.filter(u => {
+        // 1. Role Filter
+        if (userRoleFilter !== 'all' && u.role !== userRoleFilter) {
+            return false;
+        }
+
+        // 2. Status Filter
+        if (userStatusFilter !== 'all' && u.status !== userStatusFilter) {
+            return false;
+        }
+
+        // 3. Search Query
+        if (userSearchQuery.trim() !== '') {
+            const query = userSearchQuery.toLowerCase().trim();
+            const fullName1 = `${u.lastName} ${u.firstName}`.toLowerCase();
+            const fullName2 = `${u.firstName} ${u.lastName}`.toLowerCase();
+            const email = (u.email || '').toLowerCase();
+            const phone = (u.phone || '').toLowerCase();
+            if (!fullName1.includes(query) && !fullName2.includes(query) && !email.includes(query) && !phone.includes(query)) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+
+    if (filteredUsers.length === 0) {
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-5 text-muted">لا توجد نتائج تطابق البحث والفلاتر</td></tr>';
+        }
+        if (mobileContainer) {
+            mobileContainer.innerHTML = '<div class="premium-card p-5 text-center text-muted">لا توجد نتائج تطابق البحث والفلاتر</div>';
+        }
+        if (window.lucide) lucide.createIcons();
         return;
     }
 
-    allUsers.forEach(u => {
+    filteredUsers.forEach(u => {
         const roleText = u.role === 'admin' ? 'مسؤول' : u.role === 'delegate' ? 'مندوب' : 'محامي';
         const badgeClass = u.status === 'approved' ? 'bg-success' : u.status === 'pending' ? 'bg-warning text-dark' : 'bg-danger';
         const statusText = u.status === 'approved' ? 'نشط' : u.status === 'pending' ? 'قيد المراجعة' : 'مرفوض';
         const oathDisplay = u.isSyndicateMember ? '<span class="badge bg-success">عضو نقابة</span>' : (u.oathDate || '—');
         const isCurrentUser = (currentUser && u.id === currentUser.id);
 
-        const tr = document.createElement('tr');
-        tr.className = 'border-bottom';
-        tr.innerHTML = `
-            <td class="py-3 px-4">
-                <div class="fw-bold text-dark">${u.lastName} ${u.firstName}</div>
-                ${u.idCardUrl ? `
-                    <button onclick="viewIDCard('${u.idCardUrl}')" class="btn btn-link text-success p-0 m-0 text-xs border-0 d-flex align-items-center gap-1">
-                        <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                        عرض البطاقة
-                    </button>
-                ` : ''}
-            </td>
-            <td class="py-3 px-4 text-muted text-sm">${oathDisplay}</td>
-            <td class="py-3 px-4 text-muted text-sm">${roleText}</td>
-            <td class="py-3 px-4">
-                <span class="badge ${badgeClass}">${statusText}</span>
-            </td>
-            <td class="py-3 px-4">
-                <div class="d-flex align-items-center gap-1">
-                    <button onclick="editUserPrompt('${u.id}')" class="btn btn-sm btn-outline-success border-0 p-1" title="تعديل">
-                        <i data-lucide="edit" class="w-4 h-4"></i>
-                    </button>
-                    ${!isCurrentUser ? `
-                        <button onclick="deleteUserPrompt('${u.id}', '${u.lastName} ${u.firstName}')" class="btn btn-sm btn-outline-danger border-0 p-1" title="حذف">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+        // 1. Desktop Row Render
+        if (tbody) {
+            const tr = document.createElement('tr');
+            tr.className = 'border-bottom';
+            tr.innerHTML = `
+                <td class="py-3 px-4">
+                    <div class="fw-bold text-dark">${u.lastName} ${u.firstName}</div>
+                    ${u.idCardUrl ? `
+                        <button onclick="viewIDCard('${u.idCardUrl}')" class="btn btn-link text-success p-0 m-0 text-xs border-0 d-flex align-items-center gap-1">
+                            <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                            عرض البطاقة
                         </button>
-                    ` : '<span class="text-muted text-xs">أنت</span>'}
+                    ` : ''}
+                </td>
+                <td class="py-3 px-4 text-muted text-sm">
+                    ${u.email ? `<a href="mailto:${u.email}" class="text-success text-decoration-none">${u.email}</a>` : '—'}
+                </td>
+                <td class="py-3 px-4 text-muted text-sm">
+                    ${u.phone ? `<a href="tel:${u.phone}" class="text-success text-decoration-none" style="direction: ltr; display: inline-block;">${u.phone}</a>` : '—'}
+                </td>
+                <td class="py-3 px-4 text-muted text-sm">${oathDisplay}</td>
+                <td class="py-3 px-4 text-muted text-sm">${roleText}</td>
+                <td class="py-3 px-4">
+                    <span class="badge ${badgeClass}">${statusText}</span>
+                </td>
+                <td class="py-3 px-4">
+                    <div class="d-flex align-items-center gap-1">
+                        <button onclick="editUserPrompt('${u.id}')" class="btn btn-sm btn-outline-success border-0 p-1" title="تعديل">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                        </button>
+                        ${!isCurrentUser ? `
+                            <button onclick="deleteUserPrompt('${u.id}', '${u.lastName} ${u.firstName}')" class="btn btn-sm btn-outline-danger border-0 p-1" title="حذف">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        ` : '<span class="text-muted text-xs">أنت</span>'}
+                    </div>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        // 2. Mobile Card Render
+        if (mobileContainer) {
+            const card = document.createElement('div');
+            card.className = 'premium-card p-4 border border-success-subtle shadow-sm rounded-3';
+            card.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start mb-3 pb-2 border-bottom">
+                    <div>
+                        <h5 class="fw-bold mb-1 text-dark">${u.lastName} ${u.firstName}</h5>
+                        <span class="badge ${badgeClass} text-xs me-1">${statusText}</span>
+                        <span class="badge bg-light text-dark text-xs">${roleText}</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-1">
+                        <button onclick="editUserPrompt('${u.id}')" class="btn btn-sm btn-outline-success border-0 p-1" title="تعديل">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                        </button>
+                        ${!isCurrentUser ? `
+                            <button onclick="deleteUserPrompt('${u.id}', '${u.lastName} ${u.firstName}')" class="btn btn-sm btn-outline-danger border-0 p-1" title="حذف">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        ` : '<span class="badge bg-light text-muted text-xs">حسابك</span>'}
+                    </div>
                 </div>
-            </td>
-        `;
-        tbody.appendChild(tr);
+                <div class="row g-2 text-sm">
+                    <div class="col-6">
+                        <small class="text-muted d-block">سنة اليمين</small>
+                        <span class="fw-bold text-dark">${oathDisplay}</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">رقم الهاتف</small>
+                        ${u.phone ? `<a href="tel:${u.phone}" class="fw-bold text-success text-decoration-none" style="direction: ltr; display: inline-block;">${u.phone}</a>` : '<span class="text-muted">—</span>'}
+                    </div>
+                    <div class="col-12 mt-2">
+                        <small class="text-muted d-block">البريد الإلكتروني</small>
+                        ${u.email ? `<a href="mailto:${u.email}" class="fw-bold text-success text-decoration-none text-break">${u.email}</a>` : '<span class="text-muted">—</span>'}
+                    </div>
+                    ${u.idCardUrl ? `
+                        <div class="col-12 mt-2">
+                            <button onclick="viewIDCard('${u.idCardUrl}')" class="btn btn-sm btn-light text-success w-100 py-2 d-flex align-items-center justify-content-center gap-2 rounded-2 border">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                                عرض بطاقة الهوية المهنية
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            mobileContainer.appendChild(card);
+        }
     });
 
     if (window.lucide) lucide.createIcons();

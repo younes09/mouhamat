@@ -299,6 +299,18 @@ body {
 }
 
 .dark .bg-light {
+    --bs-bg-opacity: 1;
+    background-color: rgba(var(--bs-light-rgb), var(--bs-bg-opacity)) !important;
+  /* background-color: #1e293b !important; */
+}
+
+/* Theme-aware background: follows dark mode cleanly */
+.bg-light-custom {
+  background-color: #f8fafc !important;
+  transition: background-color 0.3s;
+}
+
+.dark .bg-light-custom {
   background-color: #1e293b !important;
 }
 
