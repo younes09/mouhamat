@@ -57,6 +57,17 @@ if (isset($_SESSION['user'])) {
         <p class="text-success fw-bold text-sm">نظام إدارة الجلسات الرقمي</p>
       </div>
 
+      <!-- Disclaimer Alert -->
+      <div class="alert alert-warning border-0 shadow-sm rounded-4 p-3 mb-4 d-flex align-items-start gap-2 text-start" role="alert" style="background-color: var(--amber-50); color: var(--amber-warning-text); border: 1px solid var(--amber-200) !important;">
+        <i data-lucide="alert-triangle" class="flex-shrink-0 mt-0.5" style="width: 20px; height: 20px; color: var(--amber-warning-text) !important;"></i>
+        <div>
+          <strong class="d-block mb-1" style="font-size: 0.95rem; color: var(--amber-warning-text) !important;">تنبيه هام:</strong>
+          <span style="font-size: 0.85rem; line-height: 1.5; display: block; color: var(--amber-warning-text) !important;">
+            هذا التطبيق <strong>تجريبي</strong> وليس له أي صلة رسمية أو قانونية بـ <strong>منظمة محامي البليدة</strong>.
+          </span>
+        </div>
+      </div>
+
       <!-- Tabs for Switching between Login & Register -->
       <div class="d-flex justify-content-center gap-3 mb-4 border-bottom pb-2">
         <button type="button" id="toggleLoginTab" class="btn btn-link text-decoration-none fw-black pb-2 border-bottom border-3 border-success text-success" style="font-size: 15px;">تسجيل الدخول</button>

@@ -24,6 +24,7 @@
   --amber-200: #fde68a;
   --amber-600: #d97706;
   --amber-700: #b45309;
+  --amber-warning-text: #b45309;
   
   --blue-50: #eff6ff;
   --blue-100: #dbeafe;
@@ -55,6 +56,7 @@
   --amber-50: rgba(120, 53, 15, 0.2);
   --amber-100: rgba(120, 53, 15, 0.4);
   --amber-200: rgba(245, 158, 11, 0.3);
+  --amber-warning-text: #fde68a;
   
   --blue-50: rgba(30, 58, 138, 0.2);
   --blue-100: rgba(30, 58, 138, 0.4);

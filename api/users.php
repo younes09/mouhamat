@@ -10,6 +10,10 @@ switch ($action) {
         $users = dbFetchAll("SELECT id, first_name, last_name, email, phone, oath_date, is_syndicate_member, role, status, id_card_url FROM users ORDER BY created_at DESC");
         // Format to camelCase for client compatibility
         $formatted = array_map(function ($u) {
+            $url = $u['id_card_url'];
+            if ($url && strpos($url, 'uploads/') === 0) {
+                $url = '../' . $url;
+            }
             return [
                 'id' => $u['id'],
                 'firstName' => $u['first_name'],
@@ -20,7 +24,7 @@ switch ($action) {
                 'isSyndicateMember' => (bool) $u['is_syndicate_member'],
                 'role' => $u['role'],
                 'status' => $u['status'],
-                'idCardUrl' => $u['id_card_url']
+                'idCardUrl' => $url
             ];
         }, $users);
         sendResponse($formatted);
@@ -162,8 +166,28 @@ switch ($action) {
         // delete user id card
         $user = dbFetch("SELECT * FROM users WHERE id = ?", [$id]);
         if ($user) {
-            if (file_exists($user['id_card_url'])) {
-                unlink($user['id_card_url']);
+            $filePath = $user['id_card_url'];
+            if (!empty($filePath)) {
+                // Try deleting the exact path stored
+                if (file_exists($filePath)) {
+                    unlink($filePath);
+                }
+                
+                // If it starts with '../uploads/', normalize to 'uploads/' and check/delete
+                if (strpos($filePath, '../uploads/') === 0) {
+                    $normPath = substr($filePath, 3); // removes '../'
+                    if (file_exists($normPath)) {
+                        unlink($normPath);
+                    }
+                }
+                
+                // If it starts with 'uploads/', also try with '../uploads/' just in case
+                if (strpos($filePath, 'uploads/') === 0) {
+                    $parentPath = '../' . $filePath;
+                    if (file_exists($parentPath)) {
+                        unlink($parentPath);
+                    }
+                }
             }
         }
 
