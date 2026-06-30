@@ -196,6 +196,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+        if (document.readyState === 'complete') {
+            navigator.serviceWorker.register('sw.js')
+                .then((reg) => console.log('Service Worker registered successfully:', reg.scope))
+                .catch((err) => console.error('Service Worker registration failed:', err));
+        } else {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then((reg) => console.log('Service Worker registered successfully:', reg.scope))
+                    .catch((err) => console.error('Service Worker registration failed:', err));
+            });
+        }
+    }
+
     // PWA Install Prompt
     initPwaInstall();
 });

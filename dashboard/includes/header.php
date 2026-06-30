@@ -27,6 +27,12 @@
             </span>
           </button>
 
+          <!-- PWA Install Button -->
+          <button type="button" id="installAppBtn" class="btn btn-light p-2 rounded-3 border-0 text-success d-none scale-active"
+            title="تثبيت التطبيق على الهاتف">
+            <i data-lucide="download" class="w-5 h-5"></i>
+          </button>
+
           <!-- Theme Toggle Button -->
           <button type="button" id="darkToggle" class="btn btn-light p-2 rounded-3 border-0 text-muted"
             title="الوضع الليلي">

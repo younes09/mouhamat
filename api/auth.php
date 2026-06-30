@@ -108,10 +108,15 @@ switch ($action) {
         // File upload for ID card
         $idCardUrl = null;
         if (isset($_FILES['idCard']) && $_FILES['idCard']['error'] === UPLOAD_ERR_OK) {
+            $ext = strtolower(pathinfo($_FILES['idCard']['name'], PATHINFO_EXTENSION));
+            $allowed = ['jpg', 'jpeg', 'png', 'pdf'];
+            if (!in_array($ext, $allowed, true)) {
+                sendResponse(['error' => 'نوع الملف غير مسموح به. يرجى رفع صورة أو ملف PDF فقط (jpg, jpeg, png, pdf)'], 400);
+            }
+
             if (!is_dir('uploads')) {
                 mkdir('uploads', 0777, true);
             }
-            $ext = pathinfo($_FILES['idCard']['name'], PATHINFO_EXTENSION);
             $filename = generateUUID() . '.' . $ext;
             $targetPath = 'uploads/' . $filename;
 
