@@ -5,17 +5,17 @@
   <div class="card premium-card overflow-hidden border-0 shadow-lg mb-4 position-relative"
     style="background: linear-gradient(135deg, var(--emerald-800) 0%, var(--emerald-600) 100%); min-height: 180px;">
     <!-- Abstract absolute shapes for rich premium design -->
-    <div class="position-absolute top-0 end-0 p-5 opacity-10 text-white" style="transform: scale(3.5) translate(0%, 0%); pointer-events: none; direction: ltr;">
+    <div class="position-absolute top-0 end-0 p-5 opacity-10" style="transform: scale(3.5) translate(0%, 0%); pointer-events: none; direction: ltr;">
       <i data-lucide="bell"></i>
     </div>
     
     <div class="card-body p-4 p-md-5 d-flex align-items-center position-relative z-1 h-100">
       <div class="d-flex align-items-center gap-4 flex-wrap flex-md-nowrap">
         <div class="bg-white bg-opacity-20 rounded-4 d-inline-flex p-3 backdrop-blur shadow-sm border border-white border-opacity-20 shrink-0">
-          <i data-lucide="megaphone" class="w-10 h-10 text-white"></i>
+          <i data-lucide="megaphone" class="w-10 h-10 "></i>
         </div>
-        <div class="text-right text-white">
-          <h2 class="fw-black mb-1 text-white text-3xl">لوحة الإعلانات الرسمية</h2>
+        <div class="text-right ">
+          <h2 class="fw-black mb-1  text-3xl">لوحة الإعلانات الرسمية</h2>
           <p class="text-success-emphasis mb-0 opacity-90 fw-semibold text-sm">
             آخر القرارات والمستجدات والتنبيهات الصادرة عن مندوبية نقابة المحامين.
           </p>
@@ -31,7 +31,7 @@
         <input type="text" id="announcementSearchInput"
           class="form-control form-input-custom ps-5 py-3 text-sm fw-bold shadow-sm"
           placeholder="البحث في نص الإعلان أو الكلمات المفتاحية...">
-        <span class="position-absolute start-0 top-50 translate-middle-y ps-4 text-muted">
+        <span class="position-absolute start-0 top-50 translate-middle-y ps-3 text-muted">
           <i data-lucide="search" class="w-5 h-5"></i>
         </span>
       </div>

@@ -17,12 +17,12 @@
             <!-- Search Bar -->
             <div class="col-12 col-lg-6">
               <div class="position-relative">
+                <span class="position-absolute start-0 top-50 translate-middle-y ps-3 text-muted">
+                  <i data-lucide="search" class="w-4 h-4"></i>
+                </span>
                 <input type="text" id="userSearchInput"
                   class="form-control form-input-custom ps-5 py-2.5 text-sm fw-bold shadow-sm"
                   placeholder="البحث باسم الأستاذ، البريد الإلكتروني، أو رقم الهاتف...">
-                <span class="position-absolute end-0 top-50 translate-middle-y pe-3.5 text-muted">
-                  <i data-lucide="search" class="w-4 h-4"></i>
-                </span>
               </div>
             </div>
             <!-- Role Filter -->

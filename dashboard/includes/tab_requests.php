@@ -33,7 +33,7 @@
             <input type="text" id="searchInput"
               class="form-control form-input-custom ps-5 py-3 text-sm fw-bold shadow-sm"
               placeholder="البحث برقم القضية، اسم المحامي أو الأطراف...">
-            <span class="position-absolute start-0 top-50 translate-middle-y ps-4 text-muted"><i data-lucide="search"
+            <span class="position-absolute start-0 top-50 translate-middle-y ps-3 text-muted"><i data-lucide="search"
                 class="w-5 h-5"></i></span>
           </div>
         </div>
